@@ -4,8 +4,7 @@
 TARGET	   = brefboard
 
 #Output format (elf,hex,bin)
-FORMAT	= hex
-
+FORMAT	= elf
 
 #Optimalization [0,1,2,3,s]
 OPT 	?= s
