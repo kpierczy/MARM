@@ -25,17 +25,17 @@ public:
 	// Destructor
 	virtual ~ili_fsmc_bus() {}
 	// Lock bus and set address
-	virtual void set_ctlbits( int bit, bool val );
+	void set_ctlbits( int bit, bool val ) override;
 	/* Read transfer */
-	virtual void read( void *buf, std::size_t len );
+	void read( void *buf, std::size_t len ) override;
 	/* Write transfer */
-	virtual void write( const void *buf, size_t len );
+	void write( const void *buf, size_t len ) override;
 	/* Fill pattern */
-	virtual void fill( unsigned value, size_t nelms );
+	void fill( unsigned value, size_t nelms ) override;
 	/* Wait ms long delay */
-	virtual void delay( unsigned tout );
+	void delay( unsigned tout ) override;
 	/* Set PWM  */
-	virtual void set_pwm( int percent );
+	void set_pwm( int percent ) override;
 private:
 	void fsmc_gpio_setup();
 	void fsmc_setup();

@@ -10,8 +10,7 @@
  *       Revision:  none
  *       Compiler:  gcc
  *
- *         Author:  Lucjan Bryndza (LB), lbryndza.p(at)boff(dot)pl
- *   Organization:  BoFF
+ *         Author:  Lucjan Bryndza (LB)
  *
  * =====================================================================================
  */
@@ -26,37 +25,34 @@
 
 
 // FIXME: Conflict on DMA stream 0 and 5 with I2C1_RX
-//   Update STM32 driver without DMA on the interrupt mode only
+//   Update STM32 I2C driver without DMA and IRQ only.
 
 namespace app {
 
 namespace {
 
-#define I2S3_DR_Address						(&SPI3->DR)
-#define I2S3ext_DR_Address					(&I2S3ext->DR)
+const  auto I2S3_DR_Address			=			&SPI3->DR;
+const  auto I2S3ext_DR_Address		=			&I2S3ext->DR;
+constexpr auto DMA1_S3_PRIORITY			= 	0;
+constexpr auto DMA1_S3_SUBPRIORITY	    =			0;
 
-#define DMA1_S3_PRIORITY					0
-#define DMA1_S3_SUBPRIORITY					0
+const  auto I2S3_SDTI_PORT			=			GPIOB;
+constexpr auto I2S3_SDTI_PIN		    =			4;
 
+const  auto I2S3_SDTO_PORT		    =			GPIOB;
+constexpr auto I2S3_SDTO_PIN		    =			5;
 
+const  auto I2S3_BICK_PORT		    =			GPIOB;
+constexpr auto I2S3_BICK_PIN			=			3;
 
-#define I2S3_SDTI_PORT						GPIOB
-#define I2S3_SDTI_PIN						4
+const  auto I2S3_LRCK_PORT			=			GPIOA;
+constexpr auto I2S3_LRCK_PIN			=			15;
 
-#define I2S3_SDTO_PORT						GPIOB
-#define I2S3_SDTO_PIN						5
+const  auto I2S3_MCLK_PORT			=			GPIOC;
+constexpr auto I2S3_MCLK_PIN			=			7;
 
-#define I2S3_BICK_PORT						GPIOB
-#define I2S3_BICK_PIN						3
-
-#define I2S3_LRCK_PORT						GPIOA
-#define I2S3_LRCK_PIN						15
-
-#define I2S3_MCLK_PORT						GPIOC
-#define I2S3_MCLK_PIN						7
-
-#define CHANNEL_BUFFER_SIZE				128
-#define BUFFER_SIZE							2*CHANNEL_BUFFER_SIZE
+constexpr auto CHANNEL_BUFFER_SIZE		= 128;
+constexpr auto BUFFER_SIZE				=			2*CHANNEL_BUFFER_SIZE;
 
 
 	static signed long buf1[BUFFER_SIZE];
@@ -217,7 +213,6 @@ void __attribute__ ((optimize(3), optimize("unroll-loops"))) dma1_stream0_isr_ve
 			fBuf[i] = tmp;
 		}
 
-		//DSP_Exec2Channel(fBuf, CHANNEL_BUFFER_SIZE);
 		for( int i=0; i< BUFFER_SIZE; i++ ) {
 				fBuf[i] =  fBuf[i] * 3 + AMPL * sintable[ int(phase_acc) ];
 				if( 1 ) {
@@ -244,11 +239,11 @@ void __attribute__ ((optimize(3), optimize("unroll-loops"))) dma1_stream0_isr_ve
 		}
 		dma_clear_flag(DMA1_Stream0, DMA_FLAG_TCIF0);
 	} else 	if(dma_get_flag_status(DMA1_Stream0, DMA_FLAG_TEIF0)) {
-		dbg_err("IS error abort");
+		dbg_err("DMA underflow error");
 		abort();
 
 	} else {
-		dbg_err("Inny %08x %08x", DMA1->HISR, DMA1->LISR );
+		dbg_err("DMA invalid request %08x %08x", DMA1->HISR, DMA1->LISR );
 		abort();
 	}
 }
@@ -263,7 +258,7 @@ void codec_task( fnd::bus::ibus& bus )
 	}
 	//Test codec reprogram 100 times
 	//for( int i=0; i<100; ++i ) {
-	if(1) {
+	{
 		if( codec_reset( bus ) ) {
 			dbg_err("Codec Reset failed I2S config skipped");
 			isix_wait_ms(100);
