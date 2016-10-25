@@ -24,6 +24,7 @@
 #include <isixdrv/i2c_bus.hpp>
 #include "tftdemo.hpp"
 #include "app_env.hpp"
+#include "usbdemo.h"
 #include <board/si5351.hpp>
 
 static const auto LED_PORT = GPIOG;
@@ -128,8 +129,11 @@ int main() {
 	sdio_test_setup();
 	//Blink task create
 	//isix::task_create( i2c1bus_test, &si5351, 2048, isix::get_min_priority() );
-	isix::task_create( pulse_test, nullptr, 512, isix::get_min_priority() );
+	//isix::task_create( pulse_test, nullptr, 512, isix::get_min_priority() );
 	//Enable 5V USB
+	usb_stack_init();
+	//! Don't use USB VHOST
+	if(0)
 	{
 		using namespace stm32;
 		gpio_config( GPIOE, 3, GPIO_MODE_OUTPUT, GPIO_PUPD_NONE, GPIO_SPEED_2MHZ );

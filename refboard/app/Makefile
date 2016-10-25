@@ -4,8 +4,7 @@
 TARGET	   = brefboard
 
 #Output format (elf,hex,bin)
-FORMAT	= hex
-
+FORMAT	= elf
 
 #Optimalization [0,1,2,3,s]
 OPT 	?= s
@@ -29,6 +28,9 @@ PGM_SWD = y
 PGM_TYPE=stlink-v2-1
 
 
+#USB driver type
+ISIX_USBDRV_TYPE = stm32f2_device
+
 #Common flags 
 COMMON_FLAGS = -Wall -Wextra  -Wno-variadic-macros
 #Configuration flags
@@ -37,19 +39,13 @@ COMMON_FLAGS += -I../board/include
 
 #C compiler options
 CFLAGS += $(COMMON_FLAGS)
-
 #C++ compiler options 
 CXXFLAGS += $(COMMON_FLAGS)
 
 
-#Source C files
-SRC += $(wildcard *.c) $(wildcard tcpecho/*.c)
-
-#Source C++ files
 CPPSRC += $(wildcard ../board/*.cpp)
 CPPSRC += $(wildcard *.cpp)
-
-#Source ASM files
+SRC += $(wildcard *.c) $(wildcard tcpecho/*.c)
 ASRC += $(wildcard *.S)
 
 
@@ -61,12 +57,14 @@ LIBGFX_DIR=$(ISIX_BASE_DIR)/libgfx
 LIBSTM32_DIR=$(ISIX_BASE_DIR)/libstm32
 LIBTCPIP_DIR=$(ISIX_BASE_DIR)/libtcpip
 LIBFSFAT_DIR=$(ISIX_BASE_DIR)/libfsfat
+LIBUSB_DIR=$(ISIX_BASE_DIR)/libusb
 
 include $(LIBTCPIP_DIR)/libtcpip.mk
 include $(LIBSTM32_DIR)/libstm32.mk
 include $(ISIXDRV_DIR)/isixdrv.mk
 include $(LIBGFX_DIR)/libgfx.mk
 include $(LIBFOUNDATION_DIR)/libfoundation.mk
+include $(LIBUSB_DIR)/libusb.mk
 include $(ISIX_DIR)/isix.mk
 include $(LIBFSFAT_DIR)/libfsfat.mk
 include $(LIBSTM32_DIR)/scripts/stm32.mk
