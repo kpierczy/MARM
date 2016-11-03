@@ -8,7 +8,7 @@ FORMAT	= hex
 
 
 #Optimalization [0,1,2,3,s]
-OPT 	?= 1
+OPT 	?= s
 
 #MCU variant
 MCU_MAJOR_TYPE = f4

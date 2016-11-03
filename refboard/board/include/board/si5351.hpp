@@ -260,7 +260,7 @@ public:
 	void set_clock_pwr(enum si5351_clock, uint8_t);
 	void set_clock_invert(enum si5351_clock, uint8_t);
 	void set_clock_source(enum si5351_clock, enum si5351_clock_source);
-	void set_clock_disable(enum si5351_clock, enum si5351_clock_disable);
+	void set_clock_disable(si5351_clock, si5351_clock_disable);
 	void set_clock_fanout(enum si5351_clock_fanout, uint8_t);
   void set_pll_input(enum si5351_pll, enum si5351_pll_input);
 	uint8_t si5351_write_bulk(uint8_t, uint8_t, uint8_t *);

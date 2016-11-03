@@ -242,58 +242,6 @@ static usb_cdc_line_coding_t rs232coding;
 #define RTS  0x08
 #define CTS  0x10
 
-/* Print diagnostic information on LCD. */
-#if 0
-static void LCDrefresh(void) {
-  if (refresh) {
-     char *stop, parity;
-
-    refresh = 0;
-    if (rs232coding.bCharFormat == ONE_STOP_BIT)
-      stop = "1  ";
-    else if (rs232coding.bCharFormat == ONE_AND_HALF_STOP_BITS)
-      stop = "1.5";
-    else if (rs232coding.bCharFormat == TWO_STOP_BITS)
-      stop = "2  ";
-    else
-      stop = "?  ";
-    if (rs232coding.bParityType == NO_PARITY)
-      parity = 'N';
-    else if (rs232coding.bParityType == ODD_PARITY)
-      parity = 'O';
-    else if (rs232coding.bParityType == EVEN_PARITY)
-      parity = 'E';
-    else if (rs232coding.bParityType == MARK_PARITY)
-      parity = 'M';
-    else if (rs232coding.bParityType == SPACE_PARITY)
-      parity = 'S';
-    else
-      parity = '?';
-    dbprintf( "%6lu %u%c%s%2hu", rs232coding.dwDTERate,
-            rs232coding.bDataBits, parity, stop, ep2queue);
-    if (rs232state & RTS)
-      dbprintf("RTS ");
-    else
-      dbprintf("    ");
-    if (rs232state & CTS)
-      dbprintf("CTS ");
-    else
-      dbprintf("    ");
-    if (rs232state & DTR)
-      dbprintf("DTR ");
-    else
-      dbprintf("    ");
-    if (rs232state & DSR)
-      dbprintf("DSR ");
-    else
-      dbprintf("    ");
-    if (rs232state & DCD)
-      dbprintf("DCD ");
-    else
-      dbprintf("    ");
-  }
-}
-#endif
 
 static void ResetState(void) {
   ep2queue = 0;

@@ -51,3 +51,13 @@
 // FIXME I2C driver without DMA (due to conflict with DMA channel on transfer data)
 #define CONFIG_ISIXDRV_I2C_USE_FIXED_I2C CONFIG_ISIXDRV_I2C_2
 
+
+//!Configure usb stack
+#if USB_HOST_EXAMPLE
+#define CONFIG_USBHOST_VBUS_GPIO_N  E
+#define CONFIG_USBHOST_VBUS_PIN   3
+#define CONFIG_USBHOST_VBUS_ON      1
+#define CONFIG_USBHOST_VBUS_OTYPE  GPIO_OTYPE_PP
+#define CONFIG_USBLIB_US_TIM_N 2
+#define CONFIG_USBHOST_USB_IRQ_MASK_VALUE 1
+#endif

@@ -46,7 +46,7 @@ int main() {
 	//Set timer priority
 	stm32::nvic_set_priority( SysTick_IRQn, irq_prio, irq_sub );
 	//TODO: On startup MPU is disabled
-	if( 0 ) {
+	if( 1 ) {
 		mpu_set_region_size( 0, 0x0000'0000, 0x1'0000,
 				MPU_RGN_PERM_PRV_NO_USR_NO|MPU_RGN_MEMORY| MPU_RGN_PERM_NX );
 		mpu_enable_region( 0 );
@@ -55,8 +55,8 @@ int main() {
 	for(;;)
 	if( got_key ) {
 		constexpr unsigned long* ulong_at_nulladdr = nullptr;
-		const auto val0 = *ulong_at_nulladdr;
-		dbprintf("Read nullptr %08lx", val0 );
+		//const auto val0 = *ulong_at_nulladdr;
+		dbprintf("Read nullptr %08lx", *ulong_at_nulladdr );
 		got_key = false;
 	}
 

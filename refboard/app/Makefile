@@ -64,7 +64,7 @@ include $(LIBSTM32_DIR)/libstm32.mk
 include $(ISIXDRV_DIR)/isixdrv.mk
 include $(LIBGFX_DIR)/libgfx.mk
 include $(LIBFOUNDATION_DIR)/libfoundation.mk
-include $(LIBUSB_DIR)/libusb.mk
 include $(ISIX_DIR)/isix.mk
+include $(LIBUSB_DIR)/libusb.mk
 include $(LIBFSFAT_DIR)/libfsfat.mk
 include $(LIBSTM32_DIR)/scripts/stm32.mk

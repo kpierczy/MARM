@@ -794,15 +794,15 @@ void Si5351::set_clock_source(enum si5351_clock clk, enum si5351_clock_source sr
  * of AN619 (Registers 24 and 25), there are four possible values: low,
  * high, high impedance, and never disabled.
  */
-void Si5351::set_clock_disable(enum si5351_clock clk, enum si5351_clock_disable dis_state)
+void Si5351::set_clock_disable(si5351_clock clk, enum si5351_clock_disable dis_state)
 {
 	uint8_t reg_val, reg;
 
-	if(clk >= SI5351_CLK0 && clk <= SI5351_CLK3)
+	if( clk >= SI5351_CLK0 && clk <= SI5351_CLK3 )
 	{
 		reg = SI5351_CLK3_0_DISABLE_STATE;
 	}
-	else if(clk >= SI5351_CLK4 && clk <= SI5351_CLK7)
+	else if(clk >= SI5351_CLK4 && clk <= SI5351_CLK7 )
 	{
 		reg = SI5351_CLK7_4_DISABLE_STATE;
 	}
