@@ -154,36 +154,20 @@ static usb_string_descriptor_t(1) const string_lang = {
 static usb_string_descriptor_t(16) const string_manufacturer = {
   sizeof(usb_string_descriptor_t(16)),
   STRING_DESCRIPTOR,
-  {
-    HTOUSBS('M'), HTOUSBS('a'), HTOUSBS('r'), HTOUSBS('c'),
-    HTOUSBS('i'), HTOUSBS('n'), HTOUSBS(' '), HTOUSBS('P'),
-    HTOUSBS('e'), HTOUSBS('c'), HTOUSBS('z'), HTOUSBS('a'),
-    HTOUSBS('r'), HTOUSBS('s'), HTOUSBS('k'), HTOUSBS('i')
-  }
+	  u"Lucjan Bryndza"
 };
 
 static usb_string_descriptor_t(31) const string_product = {
   sizeof(usb_string_descriptor_t(31)),
   STRING_DESCRIPTOR,
-  {
-    HTOUSBS('U'), HTOUSBS('S'), HTOUSBS('B'), HTOUSBS(' '),
-    HTOUSBS('v'), HTOUSBS('i'), HTOUSBS('r'), HTOUSBS('t'),
-    HTOUSBS('u'), HTOUSBS('a'), HTOUSBS('l'), HTOUSBS(' '),
-    HTOUSBS('s'), HTOUSBS('e'), HTOUSBS('r'), HTOUSBS('i'),
-    HTOUSBS('a'), HTOUSBS('l'), HTOUSBS(' '), HTOUSBS('p'),
-    HTOUSBS('o'), HTOUSBS('r'), HTOUSBS('t'), HTOUSBS(' '),
-    HTOUSBS('e'), HTOUSBS('x'), HTOUSBS('a'), HTOUSBS('m'),
-    HTOUSBS('p'), HTOUSBS('l'), HTOUSBS('e')
-  }
+  u"VCP STM32 training"
 };
 
 static usb_string_descriptor_t(10) const string_serial = {
   sizeof(usb_string_descriptor_t(10)),
   STRING_DESCRIPTOR,
   {
-    HTOUSBS('0'), HTOUSBS('0'), HTOUSBS('0'), HTOUSBS('0'),
-    HTOUSBS('0'), HTOUSBS('0'), HTOUSBS('0'), HTOUSBS('0'),
-    HTOUSBS('0'), HTOUSBS('1')
+	  u"DEADBEAF"
   }
 };
 
