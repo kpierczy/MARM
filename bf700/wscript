@@ -4,15 +4,16 @@
 
 # Projects list
 _prjs = [
-    'components_demo'
+    #'components_demo'
+    'f7port'
 ]
 
 #Additional extra libraries
 _libs = [
-    'isixrtos/libisixdrvstm32',
-    'isixrtos/libgfx',
-    'isixrtos/libfsfat',
-    'isixrtos/libtcpip',
+    #'isixrtos/libisixdrvstm32',
+    #'isixrtos/libgfx',
+    #'isixrtos/libfsfat',
+    #'isixrtos/libtcpip',
 ]
 
 import os
@@ -22,7 +23,6 @@ def configure( cfg ):
     for lib in _libs:
         cfg.recurse( os.path.join(os.getcwd(),lib) )
     cfg.recurse( _prjs )
-
 
 # Build
 def build( bld ):
