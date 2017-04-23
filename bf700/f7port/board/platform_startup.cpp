@@ -14,11 +14,6 @@ namespace board {
 namespace {
 
 
-//Number of isix threads
-constexpr unsigned ISIX_NUM_PRIORITIES = 4;
-//SysTimer values
-constexpr unsigned MHZ = 1000000;
-
 constexpr auto PLL_M = 25;
 constexpr auto PLL_N = 432;
 constexpr auto PLL_P = stm32::RCC_PLLP_DIV2;	//168MHZ master clock
@@ -118,7 +113,7 @@ void _external_startup(void)
 	isix_set_irq_priority_group( isix_cortexm_group_pri7 );
 
 	//Initialize isix
-	//isix::init(freq);
+	isix::init(freq);
 
 }
 

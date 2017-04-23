@@ -19,7 +19,7 @@
  
 // --------  Hardware specific config ------------
 #define  CONFIG_XTAL_HZ   25000000LU
-#define  CONFIG_HCLK_HZ  168000000LU
+#define  CONFIG_HCLK_HZ  216000000LU
 #define	 CONFIG_PCLK1_HZ (CONFIG_HCLK_HZ/4)
 #define  CONFIG_PCLK2_HZ (CONFIG_HCLK_HZ/2)
 
