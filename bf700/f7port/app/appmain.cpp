@@ -22,6 +22,7 @@
 #include <usart_simple.h>
 #include <stm32gpio.h>
 #include <isix.h>
+#include "tftdemo.hpp"
 
 
 #ifdef PDEBUG
@@ -45,13 +46,6 @@ namespace usart_debug {
 static const auto LED_PORT = GPIOG;
 
 
-void task_test_nanana( void* )
-{
-	for(;;) {
-		isix::wait_ms(1000);
-		dbprintf("Tick tick #1" );
-	}
-}
 
 
 void pulse_test( void* )
@@ -75,8 +69,9 @@ int main()
 			usart_debug::unlock, stm32::usartsimple_init,
 			USART1,115200, false, CONFIG_PCLK1_HZ, CONFIG_PCLK2_HZ
 	);
+	static app::tft_tester ft;
+	static dev::keypad kp( ft.get_frame() );
 	dbprintf("Hello from F7 board cpuid" );
-	isix::task_create( task_test_nanana, nullptr, 512, isix::get_min_priority() );
 	isix::task_create( pulse_test, nullptr, 512, isix::get_min_priority() );
 	isix::start_scheduler();
 }

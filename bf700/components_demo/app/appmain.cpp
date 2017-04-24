@@ -39,11 +39,11 @@ namespace tcp {
 namespace {
 namespace usart_debug {
 	isix::semaphore m_ulock_sem { 1, 1 };
-	void lock() 
+	void lock()
 	{
 		m_ulock_sem.wait( ISIX_TIME_INFINITE );
 	}
-	void unlock() 
+	void unlock()
 	{
 		m_ulock_sem.signal();
 	}

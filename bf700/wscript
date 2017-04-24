@@ -11,7 +11,7 @@ _prjs = [
 #Additional extra libraries
 _libs = [
     #'isixrtos/libisixdrvstm32',
-    #'isixrtos/libgfx',
+    'isixrtos/libgfx',
     #'isixrtos/libfsfat',
     #'isixrtos/libtcpip',
 ]
