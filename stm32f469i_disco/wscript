@@ -4,13 +4,11 @@
 
 # Projects list
 _prjs = [
-    'e0_led_blink',
-    'e1_graphics'
+    'lab0_led_blink',
 ]
 
 #Additional extra libraries
 _libs = [
-     './isixrtos/libgfx',
     'stm32f469i_disco/board'
 ]
 

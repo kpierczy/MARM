@@ -1,12 +1,13 @@
 {
 	"jtag": {
-		"target": 	"stm32f411e_disco/e0_led_blink/411disco_blink",
+		"target": 	"stm32f411e_disco/lab0_led_blink/led_blink",
 		"type": 	"stlink-v2",
 		"speed": 	2000,
 		"swd":      1
 	},
 	"configure" : {
 		"disable_isix": false,
-		"disable_exceptions" : true
+		"disable_exceptions" : true,
+		"debug" : true
 	}
 }

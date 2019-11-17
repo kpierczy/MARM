@@ -1,1 +1,0 @@
-../../isixrtos/libstm32/scripts/gdbinit-7.3-oldregs
