@@ -15,9 +15,9 @@ def build(bld):
     src += bld.path.ant_glob( '**/*.c' )
     bld.program(
             features='objcopy',
-            target='led_blink',
+            target='lab1gpio',
             source=src,
             install_path=False,
             includes=[ '.' ],
-            use=[ 'isix', 'periph', 'foundation', 'stm32f411ed_boot' ]
+            use=[ 'isix', 'periph', 'foundation' , 'stm32f411ed_boot' ]
             )

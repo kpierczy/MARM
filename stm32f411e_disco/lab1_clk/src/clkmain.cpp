@@ -10,11 +10,12 @@ namespace {
 }
 
 namespace app {
-    void test_thread(void*) {
+    auto lab1_thread() -> void
+    {
         for(int i=0;;++i) {
             isix::wait_ms(500);
             if(i%2==0) {
-                dbprintf("Loop %i",i>>1);
+                dbprintf("Message from thread hello: %i",i>>1);
             }
             periph::gpio::set(led_0, i%2);
         }
@@ -37,8 +38,7 @@ auto main() -> int
 		[]() {
 			m_ulock_sem.signal();
 		},
-		periph::drivers::uart_early::open,
-		"serial0", 115200
+		periph::drivers::uart_early::open, "serial0", 115200
 	);
     // Configure PD13 pin LED as an output
     periph::gpio::setup( led_0,
@@ -47,8 +47,10 @@ auto main() -> int
             periph::gpio::speed::low
         }
     );
-	isix::task_create( app::test_thread, nullptr, 1536, isix::get_min_priority() );
-    dbprintf("<<<< Hello STM32F411E-DISCO board >>>>");
+    static constexpr auto stack_size = 2048;
+    static auto thread1 = 
+        isix::thread_create_and_run(stack_size,isix::get_min_priority(),0,app::lab1_thread);
+    dbprintf("Lab1 - Clocks and PLL configuration");
 	isix::start_scheduler();
 	return 0;
 }
