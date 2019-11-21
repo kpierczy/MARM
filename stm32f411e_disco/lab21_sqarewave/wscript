@@ -15,9 +15,9 @@ def build(bld):
     src += bld.path.ant_glob( '**/*.c' )
     bld.program(
             features='objcopy',
-            target='lab1clk',
+            target='lab2sqarewave',
             source=src,
             install_path=False,
             includes=[ '.' ],
-            use=[ 'isix', 'periph', 'foundation' ]
+            use=[ 'isix', 'periph', 'foundation' , 'stm32f411ed_boot' ]
             )

@@ -4,8 +4,10 @@
 
 # Projects list
 _prjs = [
-    'lab1_clk',
-    'lab1_gpio_exti'
+    'lab20_timebase',
+    'lab21_sqarewave',
+    'lab22_pwm',
+    'lab23_freqmeas'
 ]
 
 #Additional extra libraries

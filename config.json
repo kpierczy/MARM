@@ -1,8 +1,10 @@
 {
 	"jtag": {
 		"target": 	{ 
-			"clk" : "stm32f411e_disco/lab1_clk/lab1clk",
-			"gpio" : "stm32f411e_disco/lab1_gpio_exti/lab1gpio"
+			"timebase" : "stm32f411e_disco/lab20_timebase/lab2timebase",
+			"sqarewave" : "stm32f411e_disco/lab21_sqarewave/lab2sqarewave",
+			"pwm" : "stm32f411e_disco/lab22_pwm/lab2pwm",
+			"freqmeas" : "stm32f411e_disco/lab23_freqmeas/lab2freqmeas"
 		},
 		"type": 	"stlink-v2",
 		"speed": 	2000,

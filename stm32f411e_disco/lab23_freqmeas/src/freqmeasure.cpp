@@ -3,7 +3,7 @@
 #include <periph/drivers/serial/uart_early.hpp>
 #include <periph/gpio/gpio.hpp>
 #include <isix.h>
-
+#include <stm32_ll_tim.h>
 
 namespace app {
     auto lab1_thread() -> void
@@ -33,7 +33,7 @@ auto main() -> int
     static constexpr auto stack_size = 2048;
     static auto thread1 = 
         isix::thread_create_and_run(stack_size,isix::get_min_priority(),0,app::lab1_thread);
-    dbprintf("Lab 1 - GPIO usage");
+    dbprintf("Lab 2 - frequency meter");
 	isix::start_scheduler();
 	return 0;
 }

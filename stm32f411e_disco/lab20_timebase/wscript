@@ -15,7 +15,7 @@ def build(bld):
     src += bld.path.ant_glob( '**/*.c' )
     bld.program(
             features='objcopy',
-            target='lab1gpio',
+            target='lab2timebase',
             source=src,
             install_path=False,
             includes=[ '.' ],
