@@ -3,10 +3,11 @@
 #include <periph/drivers/serial/uart_early.hpp>
 #include <periph/gpio/gpio.hpp>
 #include <isix.h>
-#include <stm32_ll_tim.h>
+#include <stm32_ll_usart.h>
+
 
 namespace app {
-    auto lab1_thread() -> void
+    auto lab3_thread() -> void
     {
         //TODO: User lab code here
     }
@@ -32,8 +33,8 @@ auto main() -> int
 	);
     static constexpr auto stack_size = 2048;
     static auto thread1 = 
-        isix::thread_create_and_run(stack_size,isix::get_min_priority(),0,app::lab1_thread);
-    dbprintf("Lab 2 - frequency meter");
+        isix::thread_create_and_run(stack_size,isix::get_min_priority(),0,app::lab3_thread);
+    dbprintf("Lab3 - Serial port");
 	isix::start_scheduler();
 	return 0;
 }

@@ -4,10 +4,7 @@
 
 # Projects list
 _prjs = [
-    'lab20_timebase',
-    'lab21_sqarewave',
-    'lab22_pwm',
-    'lab23_freqmeas'
+    'lab3_serial',
 ]
 
 #Additional extra libraries
