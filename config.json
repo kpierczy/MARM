@@ -1,6 +1,9 @@
 {
 	"jtag": {
-		"target": "stm32f411e_disco/lab3_serial/lab3serial",
+		"target": { 
+				"i2cbus" : "stm32f411e_disco/lab4_i2c_mems/i2c_mems",
+				"spibus" : "stm32f411e_disco/lab4_spi_mems/spi_mems"
+		},
 		"type": 	"stlink-v2",
 		"speed": 	2000,
 		"swd":      1

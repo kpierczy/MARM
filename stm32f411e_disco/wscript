@@ -4,7 +4,8 @@
 
 # Projects list
 _prjs = [
-    'lab3_serial',
+    'lab4_i2c_mems',
+    'lab4_spi_mems'
 ]
 
 #Additional extra libraries
