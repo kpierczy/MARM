@@ -17,7 +17,7 @@ def build(bld):
     src += bld.path.ant_glob( '**/*.c' )
     bld.program(
             features='objcopy',
-            target='i2c_mems',
+            target='events',
             source=src,
             install_path=False,
             includes=[ '.', 'board/include' ],

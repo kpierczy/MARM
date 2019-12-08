@@ -49,10 +49,11 @@ namespace {
 
 	//SPI controller
 	constexpr pin spi1_pins[] {
-		{ pinfunc::miso, gpio::num::PA6 },	//MISO config
-		{ pinfunc::mosi, gpio::num::PA7 },	//MOSI config
-		{ pinfunc::sck, gpio::num::PA5 },	//SCK config
-		{ pinfunc::cs0, gpio::num::PE3 },	//DI_Mems (Display)
+		{ pinfunc::miso, gpio::num::PB4 },	//MISO config
+		{ pinfunc::mosi, gpio::num::PB5 },	//MOSI config
+		{ pinfunc::sck, gpio::num::PB3 },	//SCK config
+		{ pinfunc::cs0, gpio::num::PB6 },	//DI_CS (Display)
+		{ pinfunc::cs1, gpio::num::PB7 },	//MEM_CS (Memory)
 		{}
 	};
 
@@ -60,12 +61,12 @@ namespace {
 		{},
 		SPI1_IRQn,
 		1,7,	//! IRQ prio subprio
-		//0
-		device_conf::fl_dma		//! Use DMA transfer
+		 device_conf::fl_dma		//! Use DMA transfer
 	};
 
 
-	// Devices array configuration
+
+
 	constexpr device devices[]
 	{
 		{

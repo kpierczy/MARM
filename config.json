@@ -1,8 +1,10 @@
 {
 	"jtag": {
 		"target": { 
-				"i2cbus" : "stm32f411e_disco/lab4_i2c_mems/i2c_mems",
-				"spibus" : "stm32f411e_disco/lab4_spi_mems/spi_mems"
+			"task_wake" : "stm32f411e_disco/lab5_1/suspend",
+			"semaphore" : "stm32f411e_disco/lab5_2/semaphore",
+			"fifoirq"   : "stm32f411e_disco/lab5_3/fifoirq",
+			"events"    : "stm32f411e_disco/lab5_4/events"
 		},
 		"type": 	"stlink-v2",
 		"speed": 	2000,
