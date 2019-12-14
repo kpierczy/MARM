@@ -1,10 +1,8 @@
 {
 	"jtag": {
 		"target": { 
-			"task_wake" : "stm32f411e_disco/lab5_1/suspend",
-			"semaphore" : "stm32f411e_disco/lab5_2/semaphore",
-			"fifoirq"   : "stm32f411e_disco/lab5_3/fifoirq",
-			"events"    : "stm32f411e_disco/lab5_4/events"
+			"adc" : "stm32f411e_disco/lab6_adc/lab6adc",
+			"dac" : "stm32f469i_disco/lab6_dac/lab6dac"
 		},
 		"type": 	"stlink-v2",
 		"speed": 	2000,

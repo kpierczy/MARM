@@ -4,10 +4,7 @@
 
 # Projects list
 _prjs = [
-    'lab5_1',
-    'lab5_2',
-    'lab5_3',
-    'lab5_4'
+    'lab6_adc'
 ]
 
 #Additional extra libraries

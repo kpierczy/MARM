@@ -1,12 +1,7 @@
-/** Example shows howto use events mechanism to the intertask
- *  communicaton
- *  Hardware platform: STM32F411E-DISCO
- *  PA2 Port - USART TXD should be connected to serial<->usb converter
- */
 #include <config/conf.h>
 #include <periph/gpio/gpio.hpp>
-#include <foundation/sys/dbglog.h>
 #include <periph/drivers/serial/uart_early.hpp>
+#include <foundation/sys/dbglog.h>
 #include <isix.h>
 
 namespace {
@@ -25,16 +20,14 @@ namespace {
 	}
 }
 
-
-// Start main function
 auto main() -> int
 {
 	usart_protected_init();
 	// Wait some time before startup
-    isix::wait_ms(500);
-    dbprintf("<<<< LAB5 events");
-	// Create 4 tasks for led controlling
+    isix::wait_ms( 500 );
+    dbprintf("<<<< LAB6 ADC converter ");
+	//TODO:  LAB5 user code here
 	isix::start_scheduler();
+	return 0;
 }
-
 

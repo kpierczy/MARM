@@ -4,7 +4,7 @@
 
 # Projects list
 _prjs = [
-    'lab0_led_blink',
+    'lab6_dac',
 ]
 
 #Additional extra libraries
