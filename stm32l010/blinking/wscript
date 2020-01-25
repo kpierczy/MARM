@@ -1,0 +1,21 @@
+#!/usr/bin/env python
+import os
+
+
+def options(opt):
+    pass
+
+def configure(conf):
+    pass
+
+def build(bld):
+    src = bld.path.ant_glob( '**/*.cpp' )
+    src += bld.path.ant_glob( '**/*.c' )
+    bld.program(
+            features='objcopy',
+            target='led_blink',
+            source=src,
+            install_path=False,
+            includes=[ '.' ],
+            use=[ 'periph', 'foundation', 'stm32l010_boot' ]
+    )

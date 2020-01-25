@@ -6,7 +6,8 @@
 		"swd":      1
 	},
 	"configure" : {
-		"disable_isix": false,
-		"disable_exceptions" : true
+		"disable_isix": true,
+		"disable_exceptions" : true,
+		"disable_tlsf": true
 	}
 }

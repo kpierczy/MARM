@@ -1,0 +1,28 @@
+#!/usr/bin/env python
+
+# Example waf script for STM32F411 discovery
+
+# Projects list
+_prjs = [
+    'blinking',
+]
+
+#Additional extra libraries
+_libs = [
+    'stm32l010/board'
+]
+
+import os
+
+# Configure
+def configure( cfg ):
+    for lib in _libs:
+        cfg.recurse( os.path.join(os.getcwd(),lib) )
+    cfg.recurse( _prjs )
+
+
+# Build
+def build( bld ):
+    for lib in _libs:
+        bld.recurse( os.path.join(os.getcwd(),lib) )
+    bld.recurse( _prjs )

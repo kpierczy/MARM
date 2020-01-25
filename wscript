@@ -20,7 +20,8 @@ _boards = [
         'zl41arm',
         'testf334',
         'stm32f411e_disco',
-        'stm32f469i_disco'
+        'stm32f469i_disco',
+        'stm32l010'
 ]
 
 # Board to cpu map
@@ -30,7 +31,8 @@ _board_cpu = {
     'zl41arm'   : 'stm32f417vgt6',
     'testf334'	: 'stm32f334x8',
     'stm32f411e_disco' : 'stm32f411vet6',
-    'stm32f469i_disco' : 'stm32f469nih6'
+    'stm32f469i_disco' : 'stm32f469nih6',
+    'stm32l010' : 'stm32l010f4p6'
 }
 
 

@@ -4,14 +4,15 @@
  *  Created on: 20 lis 2013
  *      Author: lucck
  */
+
 #include <stm32_ll_rcc.h>
 #include <stm32_ll_bus.h>
 #include <stm32_ll_system.h>
 #include <stm32_ll_gpio.h>
 #include <config/conf.h>
-#include <functional>
 #include <boot/arch/arm/cortexm/irq_vectors_table.h>
 #include <boot/arch/arm/cortexm/crashinfo.h>
+
 
 namespace drv {
 namespace board {
@@ -23,10 +24,10 @@ namespace {
  */
 bool uc_periph_setup()
 {
-
+#if 0
 	constexpr auto retries=100000;
 
-	//isix_set_irq_vectors_base( &_exceptions_vectors );
+	isix_set_irq_vectors_base( &_exceptions_vectors );
 
     //! Deinitialize RCC
     LL_RCC_DeInit();
@@ -69,12 +70,14 @@ bool uc_periph_setup()
 		}
 	}
 	return  LL_RCC_GetSysClkSource() == LL_RCC_SYS_CLKSOURCE_STATUS_PLL;
+#endif
+	return false;
 }
 
 
 
 //! Application crash called from hard fault
-void application_crash( enum crash_mode type, unsigned long* sp )
+void application_crash( crash_mode type, unsigned long* sp )
 {
 #ifdef PDEBUG
 	cortex_cm3_print_core_regs( type, sp );
@@ -123,3 +126,4 @@ void __attribute__((__interrupt__,naked)) hard_fault_exception_vector(void)
 
  
 }}	//NS drv
+
