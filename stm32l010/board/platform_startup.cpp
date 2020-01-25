@@ -24,14 +24,13 @@ namespace {
  */
 bool uc_periph_setup()
 {
-#if 0
+
 	constexpr auto retries=100000;
-
-	isix_set_irq_vectors_base( &_exceptions_vectors );
-
+	SCB->VTOR = reinterpret_cast<uintptr_t>(&_exceptions_vectors) & ~0x7FU;
+	
     //! Deinitialize RCC
     LL_RCC_DeInit();
-	LL_FLASH_SetLatency(LL_FLASH_LATENCY_2);
+	LL_FLASH_SetLatency(LL_FLASH_LATENCY_1);
 	LL_FLASH_EnablePrefetch();
 	//! Set MCU Prescallers
 	LL_RCC_SetAHBPrescaler( LL_RCC_SYSCLK_DIV_1 );
@@ -47,30 +46,6 @@ bool uc_periph_setup()
 	if( !LL_RCC_HSE_IsReady() ) {
 		return false;
 	}
-
-	//Enable clocks for GPIOS
-	LL_AHB1_GRP1_EnableClock(LL_AHB1_GRP1_PERIPH_GPIOA|LL_AHB1_GRP1_PERIPH_GPIOB|
-		LL_AHB1_GRP1_PERIPH_GPIOC|LL_AHB1_GRP1_PERIPH_GPIOD|LL_AHB1_GRP1_PERIPH_GPIOE );
-
-	//Configure PLL
-	LL_RCC_PLL_ConfigDomain_SYS(LL_RCC_PLLSOURCE_HSE, LL_RCC_PLLM_DIV_8, 400, LL_RCC_PLLP_DIV_4);
-	LL_RCC_PLL_Enable();
-	for( auto r=0; r<retries; ++r ) {
-		if( LL_RCC_PLL_IsReady() ) {
-			break;
-		}
-	}
-	if( !LL_RCC_PLL_IsReady() ) {
-		return false;
-	}
-    LL_RCC_SetSysClkSource(LL_RCC_SYS_CLKSOURCE_PLL);
-	for( auto r=0; r<retries; ++r ) {
-		if( LL_RCC_GetSysClkSource() == LL_RCC_SYS_CLKSOURCE_STATUS_PLL ) {
-			break;
-		}
-	}
-	return  LL_RCC_GetSysClkSource() == LL_RCC_SYS_CLKSOURCE_STATUS_PLL;
-#endif
 	return false;
 }
 

@@ -8,6 +8,7 @@
 	"configure" : {
 		"disable_isix": true,
 		"disable_exceptions" : true,
-		"disable_tlsf": true
+		"disable_tlsf": true,
+		"stack_size": 128
 	}
 }
