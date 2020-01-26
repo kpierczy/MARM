@@ -24,28 +24,40 @@ namespace {
  */
 bool uc_periph_setup()
 {
-
 	constexpr auto retries=100000;
-	SCB->VTOR = reinterpret_cast<uintptr_t>(&_exceptions_vectors) & ~0x7FU;
-	
+	//! Configure vectors
+	SCB->VTOR = reinterpret_cast<uintptr_t>(&_exceptions_vectors) & ~0x7FU;	
     //! Deinitialize RCC
     LL_RCC_DeInit();
-	LL_FLASH_SetLatency(LL_FLASH_LATENCY_1);
+	LL_FLASH_SetLatency(LL_FLASH_LATENCY_0);
 	LL_FLASH_EnablePrefetch();
+	LL_FLASH_EnablePreRead();
 	//! Set MCU Prescallers
 	LL_RCC_SetAHBPrescaler( LL_RCC_SYSCLK_DIV_1 );
 	LL_RCC_SetAPB2Prescaler( LL_RCC_APB2_DIV_1 );
-	LL_RCC_SetAPB1Prescaler( LL_RCC_APB1_DIV_2 );
+	LL_RCC_SetAPB1Prescaler( LL_RCC_APB1_DIV_1 );
 	//! Enable HSE generator
-	LL_RCC_HSE_Enable();
+	LL_RCC_HSI_Enable();
 	for( int i=0; i<retries; ++i ) {
-		if(LL_RCC_HSE_IsReady()) {
+		if(LL_RCC_HSI_IsReady()) {
 			break;
 		}
 	}
-	if( !LL_RCC_HSE_IsReady() ) {
+	if( !LL_RCC_HSI_IsReady() ) {
 		return false;
 	}
+	LL_RCC_SetSysClkSource(LL_RCC_SYS_CLKSOURCE_HSI);
+	for( auto r=0; r<retries; ++r ) {
+		if( LL_RCC_GetSysClkSource() == LL_RCC_SYS_CLKSOURCE_HSI) {
+			break;
+		}
+	}
+	if( LL_RCC_GetSysClkSource() != LL_RCC_SYS_CLKSOURCE_HSI) {
+		return true;
+	}
+	//Configure and enable GPIO for all blocks
+	LL_IOP_GRP1_EnableClock(LL_IOP_GRP1_PERIPH_GPIOA|
+		LL_IOP_GRP1_PERIPH_GPIOB|LL_IOP_GRP1_PERIPH_GPIOC);
 	return false;
 }
 
