@@ -1,5 +1,5 @@
 #!/bin/sh -e
-ver=2.0.18
+ver=2.0.19
 hget() {
 	if [ -x $(command -v curl) ]; then
 		curl -o $2 $1
