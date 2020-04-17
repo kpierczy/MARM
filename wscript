@@ -9,7 +9,7 @@ top = '.'
 # Optput directory
 out = 'build'
 
-#Default board for samples
+# Default board for samples
 _def_board = 'stm32f411e_disco'
 
 

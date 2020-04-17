@@ -1,0 +1,4 @@
+#ifdef FREQUENCY_MEASURE
+
+// FREQUENCY_MEASURE
+#endif
