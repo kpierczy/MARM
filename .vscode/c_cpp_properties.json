@@ -1,0 +1,43 @@
+{
+    "configurations": [
+        {
+            "name": "ISIXRTOS",
+            "includePath": [ 		
+				"${workspaceFolder}/isixrtos/libisix/include",
+				"${workspaceFolder}/isixrtos/libisix/arch/arm/include",
+				"${workspaceFolder}/isixrtos/libisix/arch/arm/cortexm/m4f/include",
+				"${workspaceFolder}/isixrtos/libisix/arch/arm/cortexm/include",
+				"${workspaceFolder}/isixrtos/libisix/arch/include",
+				"${workspaceFolder}/isixrtos/config/include",
+				"${workspaceFolder}/isixrtos/libfoundation/include",
+				"${workspaceFolder}/isixrtos/libperiph/periph/include",
+				"${workspaceFolder}/isixrtos/libperiph/vendor/arm/cortexm/stm32/f4/include",
+				"${workspaceFolder}/isixrtos/libperiph/periph/include/arch/arm/cortexm/stm32",
+				"${workspaceFolder}/isixrtos/libperiph/periph/include/arch/arm/cortexm/stm32/f4",
+				"${workspaceFolder}/isixrtos/libperiph/vendor/arm/cortexm/cmsis/include",
+				"${workspaceFolder}/isixrtos/libperiph/vendor/arm/cortexm/cmsis/device/stm32/f4/include",
+				"${workspaceFolder}/stm32f411e_disco/board/include",
+				"${workspaceFolder}/stm32f411e_disco/lab0_led_blink",
+				"${workspaceFolder}/stm32f411e_disco/lab1_counter",
+				"${workspaceFolder}/build/isixrtos/libisix/include"
+             ],
+            "defines": [
+				"PDEBUG",
+				"STM32MCU_MAJOR_TYPE_F4=1",
+				"STM32F411xE",
+				"USE_FULL_LL_DRIVER=1",
+				"HAVE_ISIX_CONFIG_H=1",
+				"_ISIX_KERNEL_CORE_=1"
+             ],
+			"compilerPath": "arm-none-eabi-g++",
+			"compilerArgs": ["-mcpu=cortex-m4", "-mthumb", "-std=gnu++17",
+							  "-mfloat-abi=hard", "-mfpu=fpv4-sp-d16", "-ffast-math", 
+							  "-fsingle-precision-constant", "-Wno-variadic-macros", 
+							  "-Wno-long-long", "-Wno-pragma-once-outside-header" ],
+            "cStandard": "c11",
+            "cppStandard": "c++17",
+            "intelliSenseMode": "gcc-x86"
+        }
+    ],
+    "version": 4
+}
