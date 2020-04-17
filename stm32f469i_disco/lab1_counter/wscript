@@ -1,0 +1,23 @@
+#!/usr/bin/env python
+import os
+
+
+def options(opt):
+    pass
+
+def configure(conf):
+    conf.check_cxx( header_name='isix_config.h', features='cxx',
+            define_name='HAVE_ISIX_CONFIG_H' )
+
+
+def build(bld):
+    src = bld.path.ant_glob( '**/*.cpp' )
+    src += bld.path.ant_glob( '**/*.c' )
+    bld.program(
+            features='objcopy',
+            target='counter',
+            source=src,
+            install_path=False,
+            includes=[ '.' ],
+            use=[ 'isix', 'periph', 'foundation', 'stm32f411ed_boot' ]
+            )
