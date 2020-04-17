@@ -10,5 +10,5 @@
 !.vscode
 tags
 .*.un~
-build/*
+/build
 waf3*

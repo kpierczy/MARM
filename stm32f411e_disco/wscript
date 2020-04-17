@@ -5,6 +5,7 @@
 # Projects list
 _prjs = [
     'lab0_led_blink',
+    'lab1_counter'
 ]
 
 #Additional extra libraries
