@@ -20,6 +20,7 @@
             "command": "python3",
             "args": [
                 "${workspaceFolder}/waf",
+                "-v"
             ],
             "group": {
                 "kind": "build",
@@ -52,7 +53,8 @@
                 " ${workspaceFolder}/waf",
                 "distclean"
             ],
-            "group": "build"
+            "group": "build",
+            "problemMatcher": []
         },
         {
             "label": "configure",

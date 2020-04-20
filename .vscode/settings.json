@@ -14,5 +14,9 @@
 		"clang.cflags": [
 			"-std=c11",
 			"-m32"
-		]
+		],
+		"files.associations": {
+			"istream": "cpp",
+			"ostream": "cpp"
+		}
 }

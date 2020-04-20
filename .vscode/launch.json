@@ -8,7 +8,7 @@
             "name": "(gdb) Launch",
             "type": "cppdbg",
             "request": "launch",
-            "program": "${workspaceFolder}/build/stm32f411e_disco/lab2_timers/timers",
+            "program": "${workspaceFolder}/build/stm32f411e_disco/lab2_timer/timer",
             "args": [],
             "stopAtEntry": true,
             "cwd": "${workspaceFolder}",

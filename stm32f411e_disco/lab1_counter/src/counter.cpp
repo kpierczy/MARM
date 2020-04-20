@@ -1,46 +1,45 @@
-#include <config/conf.h>
-#include <foundation/sys/dbglog.h>
-#include <periph/drivers/serial/uart_early.hpp>
-#include <periph/gpio/gpio.hpp>
-#include <isix.h>
-#include <isix/arch/irq_platform.h>
-#include <isix/arch/irq.h>
-
-#include <stm32_ll_rcc.h>
-#include <stm32_ll_system.h>
-#include <stm32_ll_bus.h>
-#include <stm32_ll_gpio.h>
-#include <stm32_ll_exti.h>
-
 /**
- * Program version
- *  (1) - isix
- *  (2) - LL
- *  (3) - LL with interrupt
+ * Program's model version
+ *  - ISIX
+ *  - LL
  */
-#define VERSION 1
+#define LL
 
+#include <config/conf.h> // ISIX base configuration
+#include <foundation/sys/dbglog.h> // Logging module
+#include <periph/drivers/serial/uart_early.hpp> // UART module used by logging module
+#include <isix.h> // ISIX system modules
 
-namespace {
+#include <stm32_ll_exti.h> // EXTI module
+#include <stm32_ll_rcc.h>
+#include <stm32_ll_system.h> // SYSCFG (EXTI source) config
 
-    // Debouncing time [ms]
-    constexpr int debounce_ms = 200;
-
-    // Display LEDs
-    constexpr auto led_3 = periph::gpio::num::PD13;
-    constexpr auto led_4 = periph::gpio::num::PD12;
-    constexpr auto led_5 = periph::gpio::num::PD14;
-    constexpr auto led_6 = periph::gpio::num::PD15;
-
-    // User button
-    constexpr auto button = periph::gpio::num::PA0;
-
-#if VERSION == 3
-    // Debouncing indicator
-    volatile bool debounce_active = false;
+// ISIX specific includes
+#ifdef ISIX
+#include <isix/arch/irq.h> // ISIX interrupts
+#include <periph/clock/clocks.hpp> // Peripherals enabling
+#include <periph/gpio/gpio.hpp> // GPIOs module
 #endif
 
-    /**
+// LL specific includes
+#ifdef LL
+#include <stm32_ll_bus.h> // Bus control (peripherals enabling)
+#include <stm32_ll_gpio.h> // General Purpose Input Output
+#endif
+
+
+
+
+// Common 
+namespace{
+
+    // Debouncing time [ms]
+    constexpr int DEBOUNCE_MS = 200;
+
+    // Debouncing indicator
+    volatile bool debounce_active = false;
+
+        /**
      * Configures CLK sources as follows:
      *  - SYSCLK Source : PLLCLK
      *  - PLL Source : HSE
@@ -49,11 +48,11 @@ namespace {
      *  - APB1 : 50MHz
      *  - APB2 : 100MHz
      */
-    bool uc_periph_setup()
+    bool CLK_config()
     {
         // Number of retries while waiting for 
         // CLK modules to turn on/off
-        constexpr auto retries=100000;
+        constexpr auto RETRIES = 100000;
         
         // Deinitialize RCC
         LL_RCC_DeInit();
@@ -69,7 +68,7 @@ namespace {
 
         // Enable HSE generator
         LL_RCC_HSE_Enable();
-        for( int i=0; i<retries; ++i ) {
+        for( int r = 0; r < RETRIES; ++r ) {
             if(LL_RCC_HSE_IsReady()) {
                 break;
             }
@@ -77,13 +76,6 @@ namespace {
         if( !LL_RCC_HSE_IsReady() ) {
             return false;
         }
-
-        // Enable clocks for GPIOS
-        LL_AHB1_GRP1_EnableClock(
-            LL_AHB1_GRP1_PERIPH_GPIOA|LL_AHB1_GRP1_PERIPH_GPIOB|
-            LL_AHB1_GRP1_PERIPH_GPIOC|LL_AHB1_GRP1_PERIPH_GPIOD|
-            LL_AHB1_GRP1_PERIPH_GPIOE 
-        );
 
         // Configure PLL
         LL_RCC_PLL_ConfigDomain_SYS(
@@ -93,7 +85,7 @@ namespace {
             LL_RCC_PLLP_DIV_2
         );
         LL_RCC_PLL_Enable();
-        for( auto r=0; r<retries; ++r ) {
+        for( auto r = 0; r < RETRIES; ++r ) {
             if( LL_RCC_PLL_IsReady() ) {
                 break;
             }
@@ -104,7 +96,7 @@ namespace {
 
         // Set PLL as SYSCLK source
         LL_RCC_SetSysClkSource(LL_RCC_SYS_CLKSOURCE_PLL);
-        for( auto r=0; r<retries; ++r ) {
+        for( auto r = 0; r < RETRIES; ++r ) {
             if( LL_RCC_GetSysClkSource() == LL_RCC_SYS_CLKSOURCE_STATUS_PLL ) {
                 break;
             }
@@ -115,7 +107,7 @@ namespace {
 
         // Disable HSI generator
         LL_RCC_HSI_Disable();
-        for( int i=0; i<retries; ++i ) {
+        for( int r = 0; r < RETRIES; ++r ) {
             if(!LL_RCC_HSI_IsReady()) {
                 break;
             }
@@ -125,15 +117,43 @@ namespace {
     }
 }
 
-namespace app {
 
-#if VERSION == 1
 
-    void button_counter(void*) {
-        
+
+
+#ifdef ISIX
+
+namespace {
+    
+    // Display LEDs
+    constexpr auto LED3 = periph::gpio::num::PD13;
+    constexpr auto LED4 = periph::gpio::num::PD12;
+    constexpr auto LED5 = periph::gpio::num::PD14;
+    constexpr auto LED6 = periph::gpio::num::PD15;
+
+    // User button
+    constexpr auto BUTTON = periph::gpio::num::PA0;
+
+    // GPIO ports configuration
+    void GPIO_config(){
+
+        // Enable clocks for GPIOS (A & D)
+        periph::clock::device_enable(
+            periph::dt::clk_periph{
+                .xbus = periph::dt::bus::ahb1,
+                .bit = LL_AHB1_GRP1_PERIPH_GPIOA
+            }
+        );
+        periph::clock::device_enable(
+            periph::dt::clk_periph{
+                .xbus = periph::dt::bus::ahb1,
+                .bit = LL_AHB1_GRP1_PERIPH_GPIOD
+            }
+        );
+
         // Configure LEDs
         periph::gpio::setup( 
-            {led_3, led_4, led_5, led_6},
+            {LED3, LED4, LED5, LED6},
             periph::gpio::mode::out{
                 periph::gpio::outtype::pushpull,
                 periph::gpio::speed::low
@@ -142,191 +162,67 @@ namespace app {
 
         // Configure button
         periph::gpio::setup( 
-            button,
+            BUTTON,
             periph::gpio::mode::in{
                 periph::gpio::pulltype::floating
             }
         );
-
-        // State of the button (true = pressed)
-        bool button_pressed = false;
-                
-        // Counter (mod(16)) displayed on the LEDs
-        int counter = 0;
-
-        // Debouncing utilities
-        ostick_t debounce_begin = 0;
-        
-        while(true){
-            
-            dbprintf("Counter: %i", counter);
-
-            // Display counter on LEDs
-            periph::gpio::set(led_4, counter & (1U << 3));
-            periph::gpio::set(led_3, counter & (1U << 2));
-            periph::gpio::set(led_5, counter & (1U << 1));
-            periph::gpio::set(led_6, counter & (1U << 0));
-
-            // Debouncing
-            if(!periph::gpio::get(button)){
-                debounce_begin = isix::get_jiffies();
-                button_pressed = false;
-            }
-
-            if(!button_pressed && isix::timer_elapsed(debounce_begin ,debounce_ms)){
-                button_pressed = true;
-                ++counter;
-                if(counter > 15)
-                    counter = 0;
-            }           
-            
-        }
     }
 
-#elif VERSION == 2
+    // EXTI interrupts config
+    void interrupt_config(){
 
-    void button_counter(void*) {
-
-        // Configure LEDs
-        LL_GPIO_InitTypeDef led_init_struct{
-            .Mode = LL_GPIO_MODE_OUTPUT,
-            .Speed = LL_GPIO_SPEED_FREQ_LOW,
-            .OutputType = LL_GPIO_OUTPUT_PUSHPULL
-        };
-        led_init_struct.Pin = LL_GPIO_PIN_12;
-        LL_GPIO_Init(GPIOD, &led_init_struct);
-        led_init_struct.Pin = LL_GPIO_PIN_13;
-        LL_GPIO_Init(GPIOD, &led_init_struct);
-        led_init_struct.Pin = LL_GPIO_PIN_14;
-        LL_GPIO_Init(GPIOD, &led_init_struct);
-        led_init_struct.Pin = LL_GPIO_PIN_15;
-        LL_GPIO_Init(GPIOD, &led_init_struct);
-
-        // Configure button
-        LL_GPIO_InitTypeDef button_init_struct{
-            .Pin = LL_GPIO_PIN_0,
-            .Mode = LL_GPIO_MODE_INPUT,
-            .Pull = LL_GPIO_PULL_NO
-        };
-        LL_GPIO_Init(GPIOA, &button_init_struct);
-
-        // State of the button (true = pressed)
-        bool button_pressed = false;
-        
-        // Counter (mod(16)) displayed on the LEDs
-        int counter = 0;
-
-        // Debouncing utilities
-        ostick_t debounce_begin = 0;
-
-        while(true){
-            
-            // Display counter on LEDs
-            if(counter & (1U << 3))
-                LL_GPIO_SetOutputPin(GPIOD, (1U << 12));
-            else
-                LL_GPIO_ResetOutputPin(GPIOD, (1U << 12));
-            if(counter & (1U << 2))
-                LL_GPIO_SetOutputPin(GPIOD, (1U << 13));
-            else
-                LL_GPIO_ResetOutputPin(GPIOD, (1U << 13));
-            if(counter & (1U << 1))
-                LL_GPIO_SetOutputPin(GPIOD, (1U << 14));
-            else
-                LL_GPIO_ResetOutputPin(GPIOD, (1U << 14));
-            if(counter & (1U << 0))
-                LL_GPIO_SetOutputPin(GPIOD, (1U << 15));  
-            else
-                LL_GPIO_ResetOutputPin(GPIOD, (1U << 15));
-
-            // Debouncing
-            if(!LL_GPIO_IsInputPinSet(GPIOA, (1U << 0))){
-                debounce_begin = isix::get_jiffies();
-                button_pressed = false;
+        /**
+         * EXTI module configuration
+         * 
+         * 1) Active CLK for SYSFG module
+         * 2) Configure PORTA.0 to source EXTI line 0
+         * 3) Configure EXTI module
+        */
+        periph::clock::device_enable(
+            periph::dt::clk_periph{
+                .xbus = periph::dt::bus::apb2,
+                .bit = LL_APB2_GRP1_PERIPH_SYSCFG
             }
-
-            if(!button_pressed && isix::timer_elapsed(debounce_begin ,debounce_ms)){
-                button_pressed = true;
-                ++counter;
-                if(counter > 15)
-                    counter = 0;
-            }           
-            
-        }
-    }
-
-#elif VERSION == 3
-
-    void button_counter(void*) {
-        
-        // Configure LEDs
-        LL_GPIO_InitTypeDef led_init_struct{
-            .Mode = LL_GPIO_MODE_OUTPUT,
-            .Speed = LL_GPIO_SPEED_FREQ_LOW,
-            .OutputType = LL_GPIO_OUTPUT_PUSHPULL
-        };
-        led_init_struct.Pin = LL_GPIO_PIN_12;
-        LL_GPIO_Init(GPIOD, &led_init_struct);
-        led_init_struct.Pin = LL_GPIO_PIN_13;
-        LL_GPIO_Init(GPIOD, &led_init_struct);
-        led_init_struct.Pin = LL_GPIO_PIN_14;
-        LL_GPIO_Init(GPIOD, &led_init_struct);
-        led_init_struct.Pin = LL_GPIO_PIN_15;
-        LL_GPIO_Init(GPIOD, &led_init_struct);
-
-        // Configure button
-        LL_GPIO_InitTypeDef button_init_struct{
-            .Pin = LL_GPIO_PIN_0,
-            .Mode = LL_GPIO_MODE_INPUT,
-            .Pull = LL_GPIO_PULL_NO
-        };
-        LL_GPIO_Init(GPIOA, &button_init_struct);
-            
-        // Interrupt configuration
-        LL_APB2_GRP1_EnableClock(LL_APB2_GRP1_PERIPH_SYSCFG);
-        LL_SYSCFG_SetEXTISource(LL_SYSCFG_EXTI_PORTA , LL_SYSCFG_EXTI_LINE0);
+        );
+        LL_SYSCFG_SetEXTISource(
+            LL_SYSCFG_EXTI_PORTA,
+            LL_SYSCFG_EXTI_LINE0
+        );
         LL_EXTI_EnableIT_0_31(LL_EXTI_LINE_0);
         LL_EXTI_EnableRisingTrig_0_31(LL_EXTI_LINE_0);
 
-        // Enabling EXTI irq in NVIC controller
+        // Enabling EXTI interrupts in NVIC controller
         isix::set_irq_priority(EXTI0_IRQn , {1, 7});
         isix::request_irq(EXTI0_IRQn);
+    }
 
+    // Main thread
+    void button_counter(void*) {
+        
         // State of the button (true = pressed)
         static bool button_pressed = false;
 
         // Button counter
         unsigned int counter = 0;
 
-
         // Display counter on LEDs        
         while(true){
-            if(counter & (1U << 3))
-                LL_GPIO_SetOutputPin(GPIOD, (1U << 12));
-            else
-                LL_GPIO_ResetOutputPin(GPIOD, (1U << 12));
-            if(counter & (1U << 2))
-                LL_GPIO_SetOutputPin(GPIOD, (1U << 13));
-            else
-                LL_GPIO_ResetOutputPin(GPIOD, (1U << 13));
-            if(counter & (1U << 1))
-                LL_GPIO_SetOutputPin(GPIOD, (1U << 14));
-            else
-                LL_GPIO_ResetOutputPin(GPIOD, (1U << 14));
-            if(counter & (1U << 0))
-                LL_GPIO_SetOutputPin(GPIOD, (1U << 15));  
-            else
-                LL_GPIO_ResetOutputPin(GPIOD, (1U << 15));
 
+            // Display counter on LEDs
+            periph::gpio::set(LED4, counter & (1U << 3));
+            periph::gpio::set(LED3, counter & (1U << 2));
+            periph::gpio::set(LED5, counter & (1U << 1));
+            periph::gpio::set(LED6, counter & (1U << 0));
 
             // Check if debounce is active
             if(debounce_active){
 
                 // Wait for input to stabilize
-                isix::wait_ms(debounce_ms);
+                isix::wait_ms(DEBOUNCE_MS);
 
                 // Check button state
-                if(LL_GPIO_IsInputPinSet(GPIOA, (1U << 0))){
+                if(periph::gpio::get(BUTTON)){
                     if(!button_pressed){
                         button_pressed = true;
                         ++counter;
@@ -338,29 +234,160 @@ namespace app {
                     button_pressed = false;
             }
         }
-
     }
-
-#endif
-
 }
-
-#if VERSION == 3
 
 extern "C" {
 
     void exti0_isr_vector() {
 
-        // Set debounce indicator
-        debounce_active = true;
-
         // Clear interrupt flag
         LL_EXTI_ClearFlag_0_31(LL_EXTI_LINE_0);
+
+        // Set debounce indicator
+        debounce_active = true;
     }
 
 }
 
 #endif
+
+
+
+
+
+#ifdef LL
+
+namespace {
+
+    // Display LEDs
+    constexpr auto LED3 = LL_GPIO_PIN_13;
+    constexpr auto LED4 = LL_GPIO_PIN_12;
+    constexpr auto LED5 = LL_GPIO_PIN_14;
+    constexpr auto LED6 = LL_GPIO_PIN_15;
+
+    // User button
+    constexpr auto BUTTON = LL_GPIO_PIN_0;
+
+    // GPIO ports config
+    void GPIO_config(){
+
+        // Enable clocks for GPIOS
+        LL_AHB1_GRP1_EnableClock(
+            LL_AHB1_GRP1_PERIPH_GPIOA |
+            LL_AHB1_GRP1_PERIPH_GPIOD
+        );
+
+        // Configure LEDs
+        LL_GPIO_InitTypeDef led_init_struct{
+            .Mode = LL_GPIO_MODE_OUTPUT,
+            .Speed = LL_GPIO_SPEED_FREQ_LOW,
+            .OutputType = LL_GPIO_OUTPUT_PUSHPULL
+        };
+        led_init_struct.Pin = LED3;
+        LL_GPIO_Init(GPIOD, &led_init_struct);
+        led_init_struct.Pin = LED4;
+        LL_GPIO_Init(GPIOD, &led_init_struct);
+        led_init_struct.Pin = LED5;
+        LL_GPIO_Init(GPIOD, &led_init_struct);
+        led_init_struct.Pin = LED6;
+        LL_GPIO_Init(GPIOD, &led_init_struct);
+
+        // Configure button
+        LL_GPIO_InitTypeDef button_init_struct{
+            .Pin = BUTTON,
+            .Mode = LL_GPIO_MODE_INPUT,
+            .Pull = LL_GPIO_PULL_NO
+        };
+        LL_GPIO_Init(GPIOA, &button_init_struct);
+    }
+
+    // EXTI interrupts config
+    void interrupt_config(){
+
+        // Interrupt configuration
+        LL_APB2_GRP1_EnableClock(LL_APB2_GRP1_PERIPH_SYSCFG);
+        LL_SYSCFG_SetEXTISource(LL_SYSCFG_EXTI_PORTA , LL_SYSCFG_EXTI_LINE0);
+        LL_EXTI_EnableIT_0_31(LL_EXTI_LINE_0);
+        LL_EXTI_EnableRisingTrig_0_31(LL_EXTI_LINE_0);
+
+        // Enabling EXTI irq in NVIC controller
+        NVIC_SetPriority(EXTI0_IRQn , 0);
+        NVIC_EnableIRQ(EXTI0_IRQn);
+
+    }
+
+    void button_counter(void*) {
+        
+        // State of the button (true = pressed)
+        static bool button_pressed = false;
+
+        // Button counter
+        unsigned int counter = 1;
+
+
+        // Display counter on LEDs        
+        while(true){
+            if(counter & (1U << 3))
+                LL_GPIO_SetOutputPin(GPIOD, LED4);
+            else
+                LL_GPIO_ResetOutputPin(GPIOD, LED4);
+            if(counter & (1U << 2))
+                LL_GPIO_SetOutputPin(GPIOD, LED3);
+            else
+                LL_GPIO_ResetOutputPin(GPIOD, LED3);
+            if(counter & (1U << 1))
+                LL_GPIO_SetOutputPin(GPIOD, LED5);
+            else
+                LL_GPIO_ResetOutputPin(GPIOD, LED5);
+            if(counter & (1U << 0))
+                LL_GPIO_SetOutputPin(GPIOD, LED6);  
+            else
+                LL_GPIO_ResetOutputPin(GPIOD, LED6);
+
+
+            // Check if debounce is active
+            if(debounce_active){
+
+                // Wait for input to stabilize
+                isix::wait_ms(DEBOUNCE_MS);
+
+                // Check button state
+                if(LL_GPIO_IsInputPinSet(GPIOA, BUTTON)){
+                    if(!button_pressed){
+                        button_pressed = true;
+                        ++counter;
+                        dbprintf("Button pressed");
+                        if(counter > 15)
+                            counter = 0;
+                    }        
+                }
+                else
+                    button_pressed = false;
+            }
+        }
+
+    }
+}
+
+extern "C" {
+
+    void exti0_isr_vector() {
+
+        // Clear interrupt flag
+        LL_EXTI_ClearFlag_0_31(LL_EXTI_LINE_0);
+
+        // Set debounce indicator
+        debounce_active = true;
+    }
+
+}
+
+#endif
+
+
+
+
 
 auto main() -> int
 {
@@ -385,10 +412,16 @@ auto main() -> int
 	);
 
     // Configure CLK distribution
-    uc_periph_setup();
+    CLK_config();
+
+    // GPIO configuration
+    GPIO_config();
+
+    // EXTI interrupts config
+    interrupt_config();
 
     // Create programm task
-	isix::task_create( app::button_counter, nullptr, 1536, isix::get_min_priority() );
+	isix::task_create( button_counter, nullptr, 1536, isix::get_min_priority() );
 
     // Begin scheduling
 	isix::start_scheduler();
