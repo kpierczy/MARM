@@ -10,14 +10,14 @@
 #include <periph/drivers/serial/uart_early.hpp> // UART module used by logging module
 
 #include <isix.h> // ISIX system modules
-#include <isix/arch/irq.h>
+#include <isix/arch/irq.h> // ISR symbols
 #include <periph/clock/clocks.hpp> // Peripherals enabling
-#include <periph/gpio/gpio.hpp>
+#include <periph/gpio/gpio.hpp> // GPIO framewoek
 
-#include <stm32_ll_bus.h>
-#include <stm32_ll_rcc.h>
-#include <stm32_ll_system.h>
-#include <stm32_ll_tim.h>
+#include <stm32_ll_bus.h> // Peripherals clocking
+#include <stm32_ll_rcc.h> // CLK & Reset module
+#include <stm32_ll_system.h> // Flash latency
+#include <stm32_ll_tim.h> // TIMx modules
 
 namespace {
 
@@ -67,7 +67,7 @@ namespace {
         LL_TIM_InitTypeDef TIM1_struct{
             .Prescaler         = __LL_TIM_CALC_PSC(100000000 , 10000),
             .CounterMode       = LL_TIM_COUNTERMODE_UP,
-            .Autoreload        = __LL_TIM_CALC_ARR(100000000 , LL_TIM_GetPrescaler(TIM1), 5),
+            .Autoreload        = __LL_TIM_CALC_ARR(100000000 , __LL_TIM_CALC_PSC(100000000 , 10000), 5),
             .RepetitionCounter = 0
         };
         LL_TIM_Init(TIM1, &TIM1_struct);

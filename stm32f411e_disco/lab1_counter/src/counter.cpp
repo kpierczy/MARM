@@ -3,7 +3,7 @@
  *  - ISIX
  *  - LL
  */
-#define ISIX
+#define LL
 
 #include <config/conf.h> // ISIX base configuration
 #include <foundation/sys/dbglog.h> // Logging module
