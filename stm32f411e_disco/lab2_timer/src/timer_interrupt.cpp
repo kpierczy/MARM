@@ -11,9 +11,12 @@
 
 #include <isix.h> // ISIX system modules
 #include <isix/arch/irq.h>
+#include <periph/clock/clocks.hpp> // Peripherals enabling
 #include <periph/gpio/gpio.hpp>
 
 #include <stm32_ll_bus.h>
+#include <stm32_ll_rcc.h>
+#include <stm32_ll_system.h>
 #include <stm32_ll_tim.h>
 
 namespace {
@@ -27,6 +30,27 @@ namespace {
     constexpr auto LED5 = periph::gpio::num::PD14;
     constexpr auto LED6 = periph::gpio::num::PD15;
 
+     // GPIO ports configuration
+    void GPIO_config(){
+
+        // Enable clocks for GPIOD
+        periph::clock::device_enable(
+            periph::dt::clk_periph{
+                .xbus = periph::dt::bus::ahb1,
+                .bit = RCC_AHB1ENR_GPIODEN_Pos
+            }
+        );
+
+        // Configure LEDs
+        periph::gpio::setup( 
+            {LED3, LED4, LED5, LED6},
+            periph::gpio::mode::out{
+                periph::gpio::outtype::pushpull,
+                periph::gpio::speed::low
+            }
+        );
+    }
+
     // Timer1 configuration for periodic interrupts
     void TIM1_config(void){
 
@@ -39,7 +63,6 @@ namespace {
          *  - Frequencies:
          *      + TIM1 DK_CNT : 10kHz
          *      + TIM2 OVF    : 5Hz
-         * 
          */
         LL_TIM_InitTypeDef TIM1_struct{
             .Prescaler         = __LL_TIM_CALC_PSC(100000000 , 10000),
@@ -187,13 +210,7 @@ auto main() -> int
 	);
 
     // Configure LEDs
-    periph::gpio::setup( 
-        {LED3, LED4, LED5, LED6},
-        periph::gpio::mode::out{
-            periph::gpio::outtype::pushpull,
-            periph::gpio::speed::low
-        }
-    );
+    GPIO_config();
 
     // Configure TIM1 timebase
     TIM1_config();

@@ -4,6 +4,7 @@
 #include <periph/gpio/gpio.hpp>
 #include <isix.h>
 
+#include <stm32_ll_bus.h>
 
 namespace {
     constexpr auto led_0 = periph::gpio::num::PD13;
@@ -41,6 +42,7 @@ auto main() -> int
 		"serial0", 115200
 	);
     // Configure PD13 pin LED as an output
+    LL_AHB1_GRP1_EnableClock(LL_AHB1_GRP1_PERIPH_GPIOD);
     periph::gpio::setup( led_0,
         periph::gpio::mode::out{
             periph::gpio::outtype::pushpull,

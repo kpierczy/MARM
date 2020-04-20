@@ -3,7 +3,7 @@
  *  - ISIX
  *  - LL
  */
-#define LL
+#define ISIX
 
 #include <config/conf.h> // ISIX base configuration
 #include <foundation/sys/dbglog.h> // Logging module
@@ -39,7 +39,7 @@ namespace{
     // Debouncing indicator
     volatile bool debounce_active = false;
 
-        /**
+    /**
      * Configures CLK sources as follows:
      *  - SYSCLK Source : PLLCLK
      *  - PLL Source : HSE
@@ -141,13 +141,13 @@ namespace {
         periph::clock::device_enable(
             periph::dt::clk_periph{
                 .xbus = periph::dt::bus::ahb1,
-                .bit = LL_AHB1_GRP1_PERIPH_GPIOA
+                .bit = RCC_AHB1ENR_GPIOAEN_Pos
             }
         );
         periph::clock::device_enable(
             periph::dt::clk_periph{
                 .xbus = periph::dt::bus::ahb1,
-                .bit = LL_AHB1_GRP1_PERIPH_GPIOD
+                .bit = RCC_AHB1ENR_GPIODEN_Pos
             }
         );
 
@@ -182,7 +182,7 @@ namespace {
         periph::clock::device_enable(
             periph::dt::clk_periph{
                 .xbus = periph::dt::bus::apb2,
-                .bit = LL_APB2_GRP1_PERIPH_SYSCFG
+                .bit = RCC_APB2ENR_SYSCFGEN_Pos
             }
         );
         LL_SYSCFG_SetEXTISource(
@@ -323,7 +323,7 @@ namespace {
         static bool button_pressed = false;
 
         // Button counter
-        unsigned int counter = 1;
+        unsigned int counter = 0;
 
 
         // Display counter on LEDs        
