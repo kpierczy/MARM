@@ -170,7 +170,7 @@ namespace {
     }
 
     // EXTI interrupts config
-    void interrupt_config(){
+    void EXTI_config(){
 
         /**
          * EXTI module configuration
@@ -303,7 +303,7 @@ namespace {
     }
 
     // EXTI interrupts config
-    void interrupt_config(){
+    void EXTI_config(){
 
         // Interrupt configuration
         LL_APB2_GRP1_EnableClock(LL_APB2_GRP1_PERIPH_SYSCFG);
@@ -418,7 +418,7 @@ auto main() -> int
     GPIO_config();
 
     // EXTI interrupts config
-    interrupt_config();
+    EXTI_config();
 
     // Create programm task
 	isix::task_create( button_counter, nullptr, 1536, isix::get_min_priority() );

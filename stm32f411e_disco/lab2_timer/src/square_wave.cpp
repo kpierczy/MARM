@@ -112,7 +112,7 @@ namespace {
         LL_TIM_OC_EnablePreload(TIM4, LL_TIM_CHANNEL_CH1);
         LL_TIM_OC_Init(TIM4, LL_TIM_CHANNEL_CH1, &TIM4_CC_struct);
         
-        // Enable TIM1
+        // Enable TIM4
         LL_TIM_EnableCounter(TIM4);
 
         /* Trigger the first update event by hand
