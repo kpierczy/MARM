@@ -72,6 +72,7 @@ namespace {
 
         /**
          * TIM4 compare/capture configuration structures
+         *     - Mode : Toggle
          *     - Frequency : 1Hz
          *     - Subsequent LEDs have got a phase
          *       shifted by the 90 degrees :
@@ -116,8 +117,6 @@ namespace {
     // Thread functions
     void main_thread(void*){
         while (true){
-            isix::wait_ms( 500 );
-            dbprintf("Main loop's alive!");
         }
     }
 }
@@ -154,7 +153,11 @@ auto main() -> int
 	isix::task_create(main_thread, nullptr, 1536, isix::get_min_priority() );
 
     // Send welcome message to the log (UART)
+    dbprintf("");
+    dbprintf("");
     dbprintf("<<<< Hello STM32F411E-DISCO board >>>>");
+    dbprintf("");
+    dbprintf("");
 
     // Begin scheduling
 	isix::start_scheduler();

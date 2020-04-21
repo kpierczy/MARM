@@ -3,7 +3,12 @@
  *  - ISIX
  *  - LL
  */
-#define LL
+#define ISIX
+
+/**
+ * Frequency in range [16; 10 000] HZ
+ */
+#define LED_FREQ 10
 
 #include <config/conf.h> // ISIX base configuration
 #include <foundation/sys/dbglog.h> // Logging module
@@ -67,7 +72,7 @@ namespace {
         LL_TIM_InitTypeDef TIM1_struct{
             .Prescaler         = __LL_TIM_CALC_PSC(100000000 , 10000),
             .CounterMode       = LL_TIM_COUNTERMODE_UP,
-            .Autoreload        = __LL_TIM_CALC_ARR(100000000 , __LL_TIM_CALC_PSC(100000000 , 10000), 5),
+            .Autoreload        = __LL_TIM_CALC_ARR(100000000 , __LL_TIM_CALC_PSC(100000000 , 10000), LED_FREQ),
             .RepetitionCounter = 0
         };
         LL_TIM_Init(TIM1, &TIM1_struct);
@@ -110,7 +115,7 @@ namespace {
         };
 
         while (true){
-            isix::wait_ms( 200 );
+            isix::wait_us( 1000000 / LED_FREQ );
             dbprintf("Actual LED: %s", colour[led_counter]);
         }
     }
@@ -122,18 +127,18 @@ extern "C" {
      * TIM1 "Update" Interrupt Service Routine
      * 
      * @note TIM1 module's update flag is NOT automatically
-     *       disabled after entering ISR. If this flag is
+     *       cleared after entering ISR. If this flag is
      *       active it activates a corresponding flag in the
      *       NVIC controller
      * 
      *         --------------------------------------
-     *         |  flags in the NVIC controller ARE  |
-     *         |  disactivated automaitcally during |
-     *         |  ISR servicing                     |
+     *         |  Flags in the NVIC controller ARE  |
+     *         |  cleared automaitcally during ISR  |
+     *         |  servicing                         |
      *         --------------------------------------
      * 
      *      NVIC's flag activation is performed every bus cycle
-     *      when peripheral's flag is active. It is importnat
+     *      when peripheral's flag is active. It is important
      *      to clear peripheral's flag as soon as possible
      *      after entering ISR.
      * 
@@ -217,6 +222,13 @@ auto main() -> int
 
     // Create threads
 	isix::task_create(main_thread, nullptr, 1536, isix::get_min_priority() );
+
+    // Send welcome message to the log (UART)
+    dbprintf("");
+    dbprintf("");
+    dbprintf("<<<< Hello STM32F411E-DISCO board >>>>");
+    dbprintf("");
+    dbprintf("");
 
     // Begin scheduling
 	isix::start_scheduler();

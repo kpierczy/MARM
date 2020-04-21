@@ -89,6 +89,40 @@ namespace {
         isix::request_irq(EXTI0_IRQn);
     }
 
+/* 
+     * TIM1 configuration for periodic interrupts (1Hz)
+     */
+    void TIM1_config(void){
+
+        // Enable clock from APB1 for the TIM1 periph
+        LL_APB2_GRP1_EnableClock(LL_APB2_GRP1_PERIPH_TIM1);
+
+        /**
+         * TIM1 configuration structure
+         *  - Mode : up
+         *  - Frequencies:
+         *      + TIM1 DK_CNT : 10kHz
+         *      + TIM2 OVF    : 1Hz
+         */
+        LL_TIM_InitTypeDef TIM1_struct{
+            .Prescaler         = __LL_TIM_CALC_PSC(100000000 , 10000),
+            .Autoreload        = __LL_TIM_CALC_ARR(100000000 , __LL_TIM_CALC_PSC(100000000 , 10000), 1)
+        };
+        LL_TIM_Init(TIM1, &TIM1_struct);
+
+        // Enable OVF (update) interrupts
+        LL_TIM_EnableIT_UPDATE(TIM1);
+        // Active TIM1 interrupt in NVIC module
+        isix::set_irq_priority(TIM1_UP_TIM10_IRQn, {1, 7});
+        isix::request_irq(TIM1_UP_TIM10_IRQn);
+        
+        // Enable TIM1
+        LL_TIM_EnableCounter(TIM1);
+
+        // Initialize shadow registers
+        LL_TIM_GenerateEvent_UPDATE(TIM1);
+    }
+
     /**
      *  Timer4 configuration for PWM (variable duty cycle)
      *  driving LEDs.
@@ -173,14 +207,6 @@ namespace {
         static bool direction = 0;
                 
         while (true){
-            
-            // Print info about TIM4 C/C1 registers
-            dbprintf(
-                "LED4: %i LED3: %i LED5: %i LED6: %i ARR: %i PSC: %i",
-                TIM4->CCR1, TIM4->CCR2,
-                TIM4->CCR3, TIM4->CCR4,
-                TIM4->ARR, TIM4->PSC
-            );
 
             // Check if debounce is active
             if(debounce_active){
@@ -224,6 +250,24 @@ extern "C" {
         debounce_active = true;
     }
 
+    /**
+     * Periodical interrupt (1Hz) printing actually
+     * values of TIM4 C/C 1 registers
+     */
+    void tim1_up_tim10_isr_vector(void) {
+
+        // Clear interrupt flag
+        LL_TIM_ClearFlag_UPDATE(TIM1);
+
+        // Print info about TIM4 C/C1 registers
+        dbprintf(
+            "LED4: %i LED3: %i LED5: %i LED6: %3i ARR: %i PSC: %i",
+            TIM4->CCR1, TIM4->CCR2,
+            TIM4->CCR3, TIM4->CCR4,
+            TIM4->ARR, TIM4->PSC
+        );
+    }
+
 }
 
 auto main() -> int
@@ -253,14 +297,21 @@ auto main() -> int
     // Button interrupt config
     EXTI_config();
 
-    // Configure TIM1 timebase
+    // Configure TIM4 (PWM)
     TIM4_config();
+
+    // Configure TIM1 timebase (periodic interrupt)
+    TIM1_config();
 
     // Create threads
 	isix::task_create(main_thread, nullptr, 1536, isix::get_min_priority() );
 
     // Send welcome message to the log (UART)
+    dbprintf("");
+    dbprintf("");
     dbprintf("<<<< Hello STM32F411E-DISCO board >>>>");
+    dbprintf("");
+    dbprintf("");
 
     // Begin scheduling
 	isix::start_scheduler();

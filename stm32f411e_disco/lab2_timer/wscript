@@ -12,7 +12,10 @@ def configure(conf):
 
 def build(bld):
     src = [ 'src/dts.cpp' ]
-    src += ['src/frequency_measure.cpp']
+    src += ['src/timer_interrupt.cpp']
+    # src += ['src/square_wave.cpp']
+    # src += ['src/pwm.cpp']
+    # src += ['src/frequency_measure.cpp']
     bld.program(
         features     = 'objcopy',
         target       = 'timer',
@@ -20,10 +23,5 @@ def build(bld):
         install_path = False,
         includes     = [ '.' ],
         use          = [ 'isix', 'periph', 'foundation', 'stm32f411ed_boot' ],
-        cxxflags     = [ 
-            # '-D TIMER_INTERRUPT',
-            # '-D PWM',
-            # '-D SQUARE_WAVE',
-            # '-D FREQUENCY_MEASURE'
-        ]
+        cxxflags     = [ ]
     )
