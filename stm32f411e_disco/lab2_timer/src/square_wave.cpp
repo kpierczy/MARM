@@ -34,13 +34,7 @@ namespace {
         // Enable clocks for GPIOD
         LL_AHB1_GRP1_EnableClock(LL_AHB1_GRP1_PERIPH_GPIOD);
         
-        /*
-         * Configure LEDs
-         * 
-         * @note : alternate function 
-         *                 =
-         *             TIM4_CHx     
-         */
+        // Configure LEDs to alternate function (TIM4_CHx)
         periph::gpio::setup( 
             {LED3, LED4, LED5, LED6},
             periph::gpio::mode::alt{
@@ -52,12 +46,12 @@ namespace {
     }
 
     /**
-     *  Timer2 configuration for PWM (50% duty cycle)
+     *  Timer4 configuration for PWM (50% duty cycle)
      *  driving LEDs.
      */
     void TIM4_config(void){
 
-        // Enable clock from APB1 for the TIM1 periph
+        // Enable clock from APB1 for the TIM4 periph
         LL_APB1_GRP1_EnableClock(LL_APB1_GRP1_PERIPH_TIM4);
 
         // Enable ARR preloading
@@ -67,8 +61,8 @@ namespace {
          * TIM4 configuration structure
          *  - Mode : up
          *  - Frequencies:
-         *      + TIM1 DK_CNT : 10kHz
-         *      + TIM4 OVF    : 2Hz
+         *      + DK_CNT : 10kHz
+         *      + OVF    : 2Hz
          */
         LL_TIM_InitTypeDef TIM4_struct{
             .Prescaler         = __LL_TIM_CALC_PSC(100000000 , 10000),
@@ -115,14 +109,7 @@ namespace {
         // Enable TIM4
         LL_TIM_EnableCounter(TIM4);
 
-        /* Trigger the first update event by hand
-         *
-         * @note Update event triggers every 'RepetitionCounter' times.
-         *       It also triggers loading data from timer's shadow registers.
-         *       To start timer properly Update event should be
-         *       generated to clean rubbish from the registers and load
-         *       them with desired values
-        */
+        // Initialize shadow registers
         LL_TIM_GenerateEvent_UPDATE(TIM4);
     }
 

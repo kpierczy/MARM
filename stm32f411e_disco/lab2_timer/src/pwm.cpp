@@ -90,12 +90,12 @@ namespace {
     }
 
     /**
-     *  Timer2 configuration for PWM (variable duty cycle)
+     *  Timer4 configuration for PWM (variable duty cycle)
      *  driving LEDs.
      */
     void TIM4_config(void){
 
-        // Enable clock from APB1 for the TIM1 periph
+        // Enable clock from APB1 for the TIM4 periph
         LL_APB1_GRP1_EnableClock(LL_APB1_GRP1_PERIPH_TIM4);
 
         // Enable ARR preloading
@@ -105,8 +105,8 @@ namespace {
          * TIM4 configuration structure
          *  - Mode : up
          *  - Frequencies:
-         *      + TIM1 DK_CNT : 20 kHz
-         *      + TIM4 OVF    : 199.599 Hz
+         *      + DK_CNT : 20 kHz
+         *      + OVF    : 199.599 Hz
          */
         LL_TIM_InitTypeDef TIM4_struct{
             .Prescaler         = __LL_TIM_CALC_PSC(100000000 , 100000),
@@ -154,14 +154,7 @@ namespace {
         // Enable TIM4
         LL_TIM_EnableCounter(TIM4);
 
-        /* Trigger the first update event by hand
-         *
-         * @note Update event triggers every 'RepetitionCounter' times.
-         *       It also triggers loading data from timer's shadow registers.
-         *       To start timer properly Update event should be
-         *       generated to clean rubbish from the registers and load
-         *       them with desired values
-        */
+        // Initialize shadow registers
         LL_TIM_GenerateEvent_UPDATE(TIM4);
     }
 
@@ -180,14 +173,14 @@ namespace {
         static bool direction = 0;
                 
         while (true){
-
+            
+            // Print info about TIM4 C/C1 registers
             dbprintf(
                 "LED4: %i LED3: %i LED5: %i LED6: %i ARR: %i PSC: %i",
                 TIM4->CCR1, TIM4->CCR2,
                 TIM4->CCR3, TIM4->CCR4,
                 TIM4->ARR, TIM4->PSC
             );
-
 
             // Check if debounce is active
             if(debounce_active){
