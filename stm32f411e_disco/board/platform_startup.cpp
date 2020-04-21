@@ -60,18 +60,6 @@ namespace {
             return false;
         }
 
-        /**
-         * Enable port for GPIOA
-         * 
-         * @note Dunno why, but when GPIOA clocking
-         *       is not activated before calling 
-         *       dblog_init_locked() the logging module
-         *       doesn't work.
-         */
-        LL_AHB1_GRP1_EnableClock(
-            LL_AHB1_GRP1_PERIPH_GPIOA
-        );
-
         // Configure PLL
         LL_RCC_PLL_ConfigDomain_SYS(
             LL_RCC_PLLSOURCE_HSE,

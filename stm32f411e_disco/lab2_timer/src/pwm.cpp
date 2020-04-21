@@ -275,6 +275,11 @@ auto main() -> int
 	static isix::semaphore m_ulock_sem { 1, 1 };
     isix::wait_ms( 500 );
 
+    // Enable GPIOA for USART2 alternate function
+    LL_AHB1_GRP1_EnableClock(
+        LL_AHB1_GRP1_PERIPH_GPIOA
+    );
+
     // Initialize debug logger
 	dblog_init_locked(
 		[](int ch, void*) {

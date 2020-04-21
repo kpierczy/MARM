@@ -34,6 +34,20 @@ auto main() -> int
 	static isix::semaphore m_ulock_sem { 1, 1 };
     isix::wait_ms( 500 );
 
+    /**
+     * Enable GPIOA for USART2 alternate function
+     * 
+     * @note Undermentioned dblog initialization
+     *       uses "serial0" (USART2) peripheral that
+     *       is connected to the PA2 & PA3 pins 
+     *       (alternate function AF07). Port A is
+     *       required to be clocked to select pin
+     *       mode (i.e. alternate)
+     */
+    LL_AHB1_GRP1_EnableClock(
+        LL_AHB1_GRP1_PERIPH_GPIOA
+    );
+
     // Configure logging module
 	dblog_init_locked(
 		[](int ch, void*) {

@@ -18,7 +18,7 @@
 #pragma once
  
 // --------  Hardware specific config ------------
-#define  CONFIG_XTAL_HZ   8000000LU
+#define  CONFIG_XTAL_HZ  8000000LU
 #define  CONFIG_HCLK_HZ  100000000LU
 #define	 CONFIG_PCLK1_HZ (CONFIG_HCLK_HZ/2)
 #define  CONFIG_PCLK2_HZ (CONFIG_HCLK_HZ/1)
