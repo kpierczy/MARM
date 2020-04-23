@@ -47,7 +47,7 @@ namespace {
 
     /**
      *  Timer4 configuration for PWM (50% duty cycle)
-     *  driving LEDs.
+     *  used to drive LEDs.
      */
     void TIM4_config(void){
 
@@ -93,7 +93,7 @@ namespace {
         LL_TIM_OC_Init(TIM4, LL_TIM_CHANNEL_CH2, &TIM4_CC_struct);
         // Channel_2 = LED5
         TIM4_CC_struct.OCPolarity   = LL_TIM_OCPOLARITY_HIGH,
-        TIM4_CC_struct.CompareValue = (uint32_t)(TIM4_struct.Autoreload / 2);
+        TIM4_CC_struct.CompareValue = (uint32_t)((TIM4_struct.Autoreload + 1) / 2);
         LL_TIM_OC_EnablePreload(TIM4, LL_TIM_CHANNEL_CH3);
         LL_TIM_OC_Init(TIM4, LL_TIM_CHANNEL_CH3, &TIM4_CC_struct);
         // Channel_2 = LED6
@@ -103,7 +103,7 @@ namespace {
         LL_TIM_OC_Init(TIM4, LL_TIM_CHANNEL_CH4, &TIM4_CC_struct);
         // Channel_2 = LED4
         TIM4_CC_struct.OCPolarity   = LL_TIM_OCPOLARITY_LOW,
-        TIM4_CC_struct.CompareValue = (uint32_t)(TIM4_struct.Autoreload / 2);
+        TIM4_CC_struct.CompareValue = (uint32_t)((TIM4_struct.Autoreload + 1) / 2);
         LL_TIM_OC_EnablePreload(TIM4, LL_TIM_CHANNEL_CH1);
         LL_TIM_OC_Init(TIM4, LL_TIM_CHANNEL_CH1, &TIM4_CC_struct);
         

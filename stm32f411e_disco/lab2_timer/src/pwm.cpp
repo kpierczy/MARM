@@ -139,12 +139,12 @@ namespace {
          * TIM4 configuration structure
          *  - Mode : up
          *  - Frequencies:
-         *      + DK_CNT : 20 kHz
-         *      + OVF    : 199.599 Hz
+         *      + CK_CNT : 100 kHz
+         *      + OVF    : 200 Hz
          */
         LL_TIM_InitTypeDef TIM4_struct{
             .Prescaler         = __LL_TIM_CALC_PSC(100000000 , 100000),
-            .Autoreload        = 500
+            .Autoreload        = 499
         };
         LL_TIM_Init(TIM4, &TIM4_struct);
 
