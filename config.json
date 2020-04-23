@@ -1,6 +1,6 @@
 {
 	"jtag": {
-		"target": 	"stm32f411e_disco/lab1_counter/counter",
+		"target": 	"stm32f411e_disco/lab2_timer/timer",
 		"type": 	"stlink-v2",
 		"speed": 	2000,
 		"swd":      1
