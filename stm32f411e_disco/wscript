@@ -6,7 +6,8 @@
 _prjs = [
     'lab0_led_blink',
     'lab1_counter',
-    'lab2_timer'
+    'lab2_timer',
+    'lab3_serial'
 ]
 
 #Additional extra libraries

@@ -1,11 +1,4 @@
 /**
- * Program's model version
- *  - ISIX
- *  - LL
- */
-#define ISIX
-
-/**
  * Frequency in range [16; 10 000] HZ
  */
 #define LED_FREQ 10

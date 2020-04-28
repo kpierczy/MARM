@@ -1,10 +1,3 @@
-/**
- * Program's model version
- *  - ISIX
- *  - LL
- */
-#define LL
-
 #include <config/conf.h> // ISIX base configuration
 #include <foundation/sys/dbglog.h> // Logging module
 #include <periph/drivers/serial/uart_early.hpp> // UART module used by logging module
