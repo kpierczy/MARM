@@ -5,7 +5,11 @@
 #include <periph/gpio/gpio.hpp>                 // GPIOs module
 #include <stm32_ll_bus.h>                       // Bus control (peripherals enabling)
 #include <stm32_ll_usart.h>                     // USART control
+<<<<<<< HEAD
 #include <string.h>
+=======
+#include <stdio.h>
+>>>>>>> 0d0c7a6e87ff53dd486b30fb1d09a9c5983b0603
 
 namespace {
 
@@ -32,7 +36,10 @@ namespace {
         // Enable clocks for GPIOs (A & D)
         LL_AHB1_GRP1_EnableClock(
             LL_AHB1_GRP1_PERIPH_GPIOA |
+<<<<<<< HEAD
             LL_AHB1_GRP1_PERIPH_GPIOB |
+=======
+>>>>>>> 0d0c7a6e87ff53dd486b30fb1d09a9c5983b0603
             LL_AHB1_GRP1_PERIPH_GPIOD 
         );
         
@@ -82,6 +89,7 @@ namespace {
             LL_APB2_GRP1_PERIPH_USART1
         );
 
+<<<<<<< HEAD
         // Fill USART's init structure
         LL_USART_InitTypeDef usart_struct{
             .BaudRate = 115200,
@@ -97,6 +105,27 @@ namespace {
         LL_USART_Init(USART1, &usart_struct);
 
         // Enable USART1
+=======
+        // // Enable USART
+        // LL_USART_Enable(USART1);
+
+        // // Fill USART's init structure
+        // LL_USART_InitTypeDef usart_struct{
+        //     .BaudRate = 115200,
+        //     .DataWidth = LL_USART_DATAWIDTH_8B,
+        //     .StopBits = LL_USART_STOPBITS_1,
+        //     .Parity = LL_USART_PARITY_NONE,
+        //     .TransferDirection = LL_USART_DIRECTION_TX_RX,
+        //     .HardwareFlowControl = LL_USART_HWCONTROL_NONE,
+        //     .OverSampling = LL_USART_OVERSAMPLING_16
+        // };
+
+        // // Initialize USART1
+        // LL_USART_Init(USART1, &usart_struct);
+
+        LL_USART_ConfigCharacter(USART1, LL_USART_DATAWIDTH_8B, LL_USART_PARITY_NONE, LL_USART_STOPBITS_1);
+        LL_USART_SetBaudRate(USART1, 100000000, LL_USART_OVERSAMPLING_16, 115200);
+>>>>>>> 0d0c7a6e87ff53dd486b30fb1d09a9c5983b0603
         LL_USART_Enable(USART1);
 
     }
@@ -145,7 +174,8 @@ namespace {
      */
     void puts( const char * str ){
         while( *str ) {
-            putc( *str++ );
+            // putc( *str++ );
+            periph::drivers::uart_early::puts("Darek\n");
         }
         while( !LL_USART_IsActiveFlag_TC(USART1) );
     }
@@ -155,6 +185,7 @@ namespace {
     // Main thread
     void shell(void*) {
 
+<<<<<<< HEAD
         char buffer[BUFFER_SIZE] {};
         periph::gpio::set(LED3, false);
 
@@ -218,6 +249,18 @@ namespace {
                 }
                     
             }
+=======
+        // char buffer[BUFFER_SIZE] {};
+        char buffer[] = "Darek, otwórz\n";
+
+        while(true){
+
+            char a = 'k';
+
+            isix::wait(500);
+            puts("Darek\n");
+
+>>>>>>> 0d0c7a6e87ff53dd486b30fb1d09a9c5983b0603
         }
     }
 
@@ -229,12 +272,59 @@ auto main() -> int
 	static isix::semaphore m_ulock_sem { 1, 1 };
     isix::wait_ms( 500 );
 
+<<<<<<< HEAD
     // Configure GPIO
+=======
+#ifndef ISIX
+
+    // Enable GPIOA module that debug USART is connected to
+    LL_AHB1_GRP1_EnableClock(
+        LL_AHB1_GRP1_PERIPH_GPIOA
+    );
+
+    // Configure logging module
+	dblog_init_locked(
+		[](int ch, void*) {
+			return periph::drivers::uart_early::putc(ch);
+		},
+		nullptr,
+		[]() {
+			m_ulock_sem.wait(ISIX_TIME_INFINITE);
+		},
+		[]() {
+			m_ulock_sem.signal();
+		},
+		periph::drivers::uart_early::open,
+		"serial0", 115200
+	);
+
+    // GPIO configuration
+>>>>>>> 0d0c7a6e87ff53dd486b30fb1d09a9c5983b0603
     GPIO_config();
 
-    // Configure USART1
+    // USART1 configuration
     USART1_config();
 
+<<<<<<< HEAD
+=======
+    // Send welcome message to the log (UART)
+    dbprintf("");
+    dbprintf("");
+    dbprintf("<<<< Hello STM32F411E-DISCO board >>>>");
+    dbprintf("");
+    dbprintf("");
+
+#else
+
+    // GPIO configuration
+    GPIO_config();
+
+    // Enable USART1
+    periph::drivers::uart_early::open("serial1", 115200);
+
+#endif
+
+>>>>>>> 0d0c7a6e87ff53dd486b30fb1d09a9c5983b0603
     // Create task
 	isix::task_create( shell, nullptr, 1536, isix::get_min_priority() );
 
