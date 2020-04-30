@@ -21,5 +21,5 @@ def build(bld):
         install_path = False,
         includes     = [ '.' ],
         use          = [ 'isix', 'periph', 'foundation', 'stm32f411ed_boot' ],
-        # cxxflags     = [ '-D ISIX']
+        cxxflags     = [ '-D ISIX']
     )

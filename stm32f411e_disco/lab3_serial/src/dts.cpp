@@ -8,8 +8,6 @@
 #include <stm32_ll_bus.h>
 #include <stm32_ll_rcc.h>
 
-
-
 namespace periph::dt::_dts_config {
 
 namespace {
@@ -47,17 +45,6 @@ namespace {
 		{}
 	};
 
-#ifdef ISIX
-
-	// Additional serial interface
-	constexpr pin ser1_pins[] {
-		{ pinfunc::txd, gpio::num::PA9 },
-		{ pinfunc::rxd, gpio::num::PA10 }
-		{}
-	};
-
-#endif
-
 	// SPI controller
 	constexpr pin spi1_pins[] {
 		{ pinfunc::miso, gpio::num::PB4 },	//MISO config
@@ -84,16 +71,6 @@ namespace {
 			ser0_pins,
 			nullptr
 		},
-
-#ifdef ISIX
-		{
-			"serial1", reinterpret_cast<uintptr_t>(USART1),
-			bus::apb2, LL_GPIO_AF_7,
-			unsigned(std::log2(LL_APB2_GRP1_PERIPH_USART1)),
-			ser1_pins,
-			nullptr
-		},
-#endif
 
 		{
 			"spi1", reinterpret_cast<uintptr_t>(SPI1),

@@ -3,10 +3,8 @@
 #include <periph/drivers/serial/uart_early.hpp> // UART module used by logging module
 #include <isix.h>                               // ISIX system modules
 #include <periph/gpio/gpio.hpp>                 // GPIOs module
-
 #include <stm32_ll_bus.h>                       // Bus control (peripherals enabling)
-#include <stm32_ll_usart.h>
-
+#include <stm32_ll_usart.h>                     // USART control
 #include <stdio.h>
 
 namespace {
@@ -31,8 +29,10 @@ namespace {
     void GPIO_config(){
 
         // Enable clocks for GPIOs (A & D)
-        LL_AHB1_GRP1_EnableClock(LL_AHB1_GRP1_PERIPH_GPIOA);
-        LL_AHB1_GRP1_EnableClock(LL_AHB1_GRP1_PERIPH_GPIOD);
+        LL_AHB1_GRP1_EnableClock(
+            LL_AHB1_GRP1_PERIPH_GPIOA |
+            LL_AHB1_GRP1_PERIPH_GPIOD 
+        );
         
         // Configure LEDs
         periph::gpio::setup( 
@@ -73,29 +73,34 @@ namespace {
      *    4) Parity control : None 
      * 
      */
-    bool USART1_config(){
+    void USART1_config(){
 
         // NebaleEnable APB2 clock for USART1 peripheral
         LL_APB2_GRP1_EnableClock(
             LL_APB2_GRP1_PERIPH_USART1
         );
 
-        // Fill USART's init structure
-        LL_USART_InitTypeDef usart_struct{
-            .BaudRate = 115200,
-            .DataWidth = LL_USART_DATAWIDTH_8B,
-            .StopBits = LL_USART_STOPBITS_1,
-            .Parity = LL_USART_PARITY_NONE,
-            .TransferDirection = LL_USART_DIRECTION_TX_RX,
-            .HardwareFlowControl = LL_USART_HWCONTROL_NONE,
-            .OverSampling = LL_USART_OVERSAMPLING_16
-        };
+        // // Enable USART
+        // LL_USART_Enable(USART1);
 
-        // Initialize USART1
-        LL_USART_Init(USART1, &usart_struct);
+        // // Fill USART's init structure
+        // LL_USART_InitTypeDef usart_struct{
+        //     .BaudRate = 115200,
+        //     .DataWidth = LL_USART_DATAWIDTH_8B,
+        //     .StopBits = LL_USART_STOPBITS_1,
+        //     .Parity = LL_USART_PARITY_NONE,
+        //     .TransferDirection = LL_USART_DIRECTION_TX_RX,
+        //     .HardwareFlowControl = LL_USART_HWCONTROL_NONE,
+        //     .OverSampling = LL_USART_OVERSAMPLING_16
+        // };
 
-        // Enable USART1
+        // // Initialize USART1
+        // LL_USART_Init(USART1, &usart_struct);
+
+        LL_USART_ConfigCharacter(USART1, LL_USART_DATAWIDTH_8B, LL_USART_PARITY_NONE, LL_USART_STOPBITS_1);
+        LL_USART_SetBaudRate(USART1, 100000000, LL_USART_OVERSAMPLING_16, 115200);
         LL_USART_Enable(USART1);
+
     }
 
     // Put a single character to transfer
@@ -137,7 +142,8 @@ namespace {
      */
     void puts( const char * str ){
         while( *str ) {
-            putc( *str++ );
+            // putc( *str++ );
+            periph::drivers::uart_early::puts("Darek\n");
         }
         while( !LL_USART_IsActiveFlag_TC(USART1) );
     }
@@ -151,10 +157,16 @@ namespace {
     // Main thread
     void shell(void*) {
 
-        char buffer[BUFFER_SIZE] {};
+        // char buffer[BUFFER_SIZE] {};
+        char buffer[] = "Darek, otwórz\n";
 
         while(true){
+
+            char a = 'k';
+
+            isix::wait(500);
             puts("Darek\n");
+
         }
     }
 
@@ -189,13 +201,11 @@ auto main() -> int
 		"serial0", 115200
 	);
 
-#endif
+    // GPIO configuration
+    GPIO_config();
 
-    // Configure USART1
+    // USART1 configuration
     USART1_config();
-
-    // Create task
-	isix::task_create( shell, nullptr, 1536, isix::get_min_priority() );
 
     // Send welcome message to the log (UART)
     dbprintf("");
@@ -203,6 +213,19 @@ auto main() -> int
     dbprintf("<<<< Hello STM32F411E-DISCO board >>>>");
     dbprintf("");
     dbprintf("");
+
+#else
+
+    // GPIO configuration
+    GPIO_config();
+
+    // Enable USART1
+    periph::drivers::uart_early::open("serial1", 115200);
+
+#endif
+
+    // Create task
+	isix::task_create( shell, nullptr, 1536, isix::get_min_priority() );
 
     // Begin scheduling
     isix::start_scheduler();
