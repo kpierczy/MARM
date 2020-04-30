@@ -47,16 +47,12 @@ namespace {
 		{}
 	};
 
-#ifdef ISIX
-
 	// Additional serial interface
 	constexpr pin ser1_pins[] {
-		{ pinfunc::txd, gpio::num::PA9 },
-		{ pinfunc::rxd, gpio::num::PA10 }
+		{ pinfunc::txd, gpio::num::PA15 },
+		{ pinfunc::rxd, gpio::num::PB7 },
 		{}
 	};
-
-#endif
 
 	// SPI controller
 	constexpr pin spi1_pins[] {
@@ -85,7 +81,6 @@ namespace {
 			nullptr
 		},
 
-#ifdef ISIX
 		{
 			"serial1", reinterpret_cast<uintptr_t>(USART1),
 			bus::apb2, LL_GPIO_AF_7,
@@ -93,7 +88,6 @@ namespace {
 			ser1_pins,
 			nullptr
 		},
-#endif
 
 		{
 			"spi1", reinterpret_cast<uintptr_t>(SPI1),
