@@ -295,7 +295,7 @@ namespace {
 
             // Read CPU load and write an appropriate message to terminal
             char cpu_state[30] {};
-            if(sprintf(cpu_state, "CPU: %i%% \r\n", isix::cpuload() / 10 ) < 0)
+            if(sprintf(cpu_state, "CPU: %d.1%% \r\n", ((float)isix::cpuload()) / 10.0f ) < 0)
                 puts("Error! Cannot display CPU informations!");
             else
                 puts(cpu_state);
