@@ -2,14 +2,11 @@
 #include <foundation/sys/dbglog.h>              // Logging module
 #include <periph/drivers/serial/uart_early.hpp> // UART module used by logging module
 #include <isix.h>                               // ISIX system modules
+#include <memory.h>                             // Heap informations
 #include <periph/gpio/gpio.hpp>                 // GPIOs module
 #include <stm32_ll_bus.h>                       // Bus control (peripherals enabling)
 #include <stm32_ll_usart.h>                     // USART control
-<<<<<<< HEAD
-#include <string.h>
-=======
-#include <stdio.h>
->>>>>>> 0d0c7a6e87ff53dd486b30fb1d09a9c5983b0603
+#include <string.h>                             // C-strings formatting
 
 namespace {
 
@@ -36,10 +33,7 @@ namespace {
         // Enable clocks for GPIOs (A & D)
         LL_AHB1_GRP1_EnableClock(
             LL_AHB1_GRP1_PERIPH_GPIOA |
-<<<<<<< HEAD
             LL_AHB1_GRP1_PERIPH_GPIOB |
-=======
->>>>>>> 0d0c7a6e87ff53dd486b30fb1d09a9c5983b0603
             LL_AHB1_GRP1_PERIPH_GPIOD 
         );
         
@@ -71,8 +65,6 @@ namespace {
         );
     }
 
-#ifndef ISIX
-
     /**
      * USART1 configuration :
      * 
@@ -89,7 +81,6 @@ namespace {
             LL_APB2_GRP1_PERIPH_USART1
         );
 
-<<<<<<< HEAD
         // Fill USART's init structure
         LL_USART_InitTypeDef usart_struct{
             .BaudRate = 115200,
@@ -101,37 +92,19 @@ namespace {
             .OverSampling = LL_USART_OVERSAMPLING_16
         };
 
-        // // Initialize USART1
+        // Initialize USART1
         LL_USART_Init(USART1, &usart_struct);
 
         // Enable USART1
-=======
-        // // Enable USART
-        // LL_USART_Enable(USART1);
-
-        // // Fill USART's init structure
-        // LL_USART_InitTypeDef usart_struct{
-        //     .BaudRate = 115200,
-        //     .DataWidth = LL_USART_DATAWIDTH_8B,
-        //     .StopBits = LL_USART_STOPBITS_1,
-        //     .Parity = LL_USART_PARITY_NONE,
-        //     .TransferDirection = LL_USART_DIRECTION_TX_RX,
-        //     .HardwareFlowControl = LL_USART_HWCONTROL_NONE,
-        //     .OverSampling = LL_USART_OVERSAMPLING_16
-        // };
-
-        // // Initialize USART1
-        // LL_USART_Init(USART1, &usart_struct);
-
-        LL_USART_ConfigCharacter(USART1, LL_USART_DATAWIDTH_8B, LL_USART_PARITY_NONE, LL_USART_STOPBITS_1);
-        LL_USART_SetBaudRate(USART1, 100000000, LL_USART_OVERSAMPLING_16, 115200);
->>>>>>> 0d0c7a6e87ff53dd486b30fb1d09a9c5983b0603
         LL_USART_Enable(USART1);
 
     }
 
     /**
-     *  Put a single character to transfer
+     *  Waits for transfer buffer to be empty and puta
+     *  a single character to it
+     * 
+     *  @param ch : character to transfer
      */
     void putc( int ch ){
         while( !LL_USART_IsActiveFlag_TXE(USART1) );
@@ -139,7 +112,22 @@ namespace {
     }
 
     /**
-     *  Get a single character from buffer
+     * Sends C-type string via USART1. After putting the
+     * last character into buffer function waits for
+     * TC (Transfer Complete) flag to be set by hardware
+     * 
+     * @param str : C-type string to send (ends with NULL)
+     */
+    void puts( const char * str ){
+        while( *str ) {
+            putc( *str++ );
+        }
+        while( !LL_USART_IsActiveFlag_TC(USART1) );
+    }
+
+    /**
+     * Waits for receive buffer to receive a new data.
+     * Then returns it's content.     * 
      */
     int getc(){
         while( !LL_USART_IsActiveFlag_RXNE(USART1) );
@@ -147,19 +135,23 @@ namespace {
     }
 
     /**
+     * Get a line from the USART1 channel. Line is defined
+     * as a chain of characters ended up with \n or \r.
      * 
-     * Get a string from a buffer (chain of characters close with NULL).
-     * 
-     *  @param arr : pointer to the array to fill
-     *  @returns : number of characters received - 1 ('\n' included).
-     *             If '\n' character is not received, function returns (-1)
+     *  @param arr [out] : incoming string buffer
+     *  @returns : number of characters received (line-ending
+     *             character excluded). If \n or \r character
+     *             is not received before buffer overflow,
+     *             function returns (-1)
      */
     int getline(char * arr){
         int num;
         for(num = 0; num < BUFFER_SIZE; ++num){
             arr[num] = getc();
-            if(arr[num] == '\n')
+            if(arr[num] == '\n' || arr[num] == '\r'){
+                arr[num] = NULL;
                 break;
+            }
         }
         if(num == BUFFER_SIZE)
             return -1;
@@ -168,99 +160,185 @@ namespace {
     }
 
     /**
-     * Sends C-type string via USART1
+     * Function analyses an input string. If a valid
+     * shell command is recognized, an adequate action
+     * is taken.
      * 
-     * @param str : C-type string to send (end with NULL)
+     * @param str [in] : input string
+     * @returns : true if an input string was recognised
+     *            as a valid command; false otherwise
+     * 
+     * @note : content of the input value is discarded
      */
-    void puts( const char * str ){
-        while( *str ) {
-            // putc( *str++ );
-            periph::drivers::uart_early::puts("Darek\n");
+    bool shellCommand(char * str){
+        
+        /**
+         * (1) LED status change request
+         */
+        if(strncmp(str, "led ", 4) == NULL){
+
+            // Initialize led to switch
+            auto led = periph::gpio::num::PA0;
+
+            // Check led number
+            switch(str[4]){
+                case '3':
+                    led = LED3;
+                    break;
+                case '4':
+                    led = LED4;
+                    break;
+                case '5':
+                    led = LED5;
+                    break;
+                case '6':
+                    led = LED6;
+                    break;
+                default:
+                    return false;
+                    
+            };
+
+            // If led number is valid, try to execute command
+            if(strcmp(str + 6, "on") == NULL){
+                periph::gpio::set(led, true);    
+            } 
+            if(strcmp(str + 6, "off") == NULL){
+                periph::gpio::set(led, false);
+            }
+
+            return true;
+
+        } 
+        /**
+         *  (2) Request for the USER button state
+         */
+        else if(strcmp(str, "button") == NULL){
+
+            // Read button state and write an appropriate message to terminal
+            char button_state[30];
+            if( sprintf(button_state, "Button:  %i\n\r", periph::gpio::get(BUTTON)) < 0 )
+                puts("Error! Cannot display button state!\r\n");
+            else
+                puts(button_state);                    
+
+            return true;
+                
         }
-        while( !LL_USART_IsActiveFlag_TC(USART1) );
+        /**
+         * (3) Request for the heap status
+         */
+        else if(strcmp(str, "heap") == NULL){
+
+            // Get informations about heap
+            isix_memory_stat heap;
+            isix_heap_stats(&heap);
+            
+            // Print informations
+            char heap_free[30] {};
+            char heap_used[30] {};
+            char heap_fragments[30] {};
+
+            if( sprintf(heap_free     , "Free     :  %i\n\r", heap.free     ) < 0 ||
+                sprintf(heap_used     , "Used     :  %i\n\r", heap.used     ) < 0 ||
+                sprintf(heap_fragments, "Fragments:  %i\n\r", heap.fragments) < 0 )
+                puts("Error! Cannot display heap informations!\r\n");
+            else{
+                puts(heap_free);
+                puts(heap_used);
+                puts(heap_fragments);
+            }
+
+            return true;
+
+        }
+        /**
+         * (4) Request for CPU state
+         */
+        else if(strcmp(str, "cpu") == NULL){
+
+            // Read CPU load and write an appropriate message to terminal
+            char cpu_state[30] {};
+            if(sprintf(cpu_state, "CPU: %i%% \r\n", isix::cpuload() / 10 ) < 0)
+                puts("Error! Cannot display CPU informations!");
+            else
+                puts(cpu_state);
+
+            return true;
+
+        }
+        /**
+         * (5) Print available commands
+         */
+        else if(strcmp(str, "help") == NULL){
+
+            puts("\r\n");
+            puts("<<<<<<<<<<<<<<<<<<<<<<>>>>>>>>>>>>>>>>>>>>>\r\n");
+            puts("|   1) led x on/off [x in {3, 4, 5, 6}]   |\r\n");
+            puts("|   2) button                             |\r\n");
+            puts("|   3) heap                               |\r\n");
+            puts("|   4) cpu                                |\r\n");
+            puts("<<<<<<<<<<<<<<<<<<<<<<>>>>>>>>>>>>>>>>>>>>>\r\n");
+            puts("\r\n");
+
+            return true;
+
+        }
+        /**
+         * (6) If user typed a longer string that was
+         *     not recognized as a valid command print
+         *     help information.
+         */
+        else if(strlen(str) > 10){
+
+            puts("\r\n");
+            puts("<<<<<<<<<<<<<<<<<<<<<<<>>>>>>>>>>>>>>>>>>>>>>>\r\n");
+            puts("| Incorrect command. Available commands are: |\r\n");
+            puts("|   1) led x on/off [x in {3, 4, 5, 6}]      |\r\n");
+            puts("|   2) button                                |\r\n");
+            puts("|   3) heap                                  |\r\n");
+            puts("|   4) cpu                                   |\r\n");
+            puts("<<<<<<<<<<<<<<<<<<<<<<<>>>>>>>>>>>>>>>>>>>>>>>\r\n");
+            puts("\r\n");
+
+        }
+
+        return false;
+
     }
 
-#endif
 
-    // Main thread
+    /**
+     * Main thread function implementing a simple interactive
+     * shell application. User can communicate with the programm
+     * via USART1 channel.
+     */
     void shell(void*) {
 
-<<<<<<< HEAD
+        // Read buffer
         char buffer[BUFFER_SIZE] {};
-        periph::gpio::set(LED3, false);
 
         while(true){
+
+            // Ge a new line (blocking read)
             int ret = getline(buffer);
+
+            /**
+             * If some characters were received check the line content.
+             * There are several commands that can be server by the programm.
+             * The if-else ladder analyses the string and decides what
+             * action should be taken.
+             */
             if(ret > 0){
-                buffer[ret] = NULL;
-                
-                // LED status change request
-                if(strncmp(buffer, "led ", 4) == NULL){
 
-                    // Initialize led to switch
-                    auto led = preiph::gpio::PA0;
+                // Analyse incoming line
+                shellCommand(buffer);
 
-                    // Check led number
-                    switch(buffer[4]){
-                        case 3:
-                            led = LED3;
-                            break;
-                        case 4:
-                            led = LED4;
-                            break;
-                        case 5:
-                            led = LED5;
-                            break;
-                        case 6:
-                            led = LED6;
-                            break;
-                    };
-
-                    // Check requested state
-                    if(strcmp(buffer + 6, "on")){
-                        periph::gpio::set(led, true);    
-                    } 
-                    if(strcmp(buffer + 6, "off")){
-                        periph::gpio::set(led, false);
-                    }
-                } 
-                // Button state request
-                else if(strcmp(buffer, "button")){
-                    char button_state[12] = "Button:  \n\r";
-                    if(periph::gpio::get(BUTTON) == 1){
-                        button_state[8] = '1';
-                    }
-                    else{
-                        button_state[8] = '0';
-                    }
-                    puts(button_state)
-                }
-                // Free stack space request
-                else if(strcmp(buffer, "heap")){
-                    char heap_state[] = "Heap:     \n\r";
-                    memory_stat stat;
-                    heap_stats(memory_stat);
-                    heap_state()
-                }
-                // CPU use request
-                else if(strcmp(buffer, "cpu")){
-                    char cpu_state[] = "CPU: \n\r"
-                    puts()
-                }
-                    
+                // Clear str (debug helpful)
+                for(int i = 0; i < BUFFER_SIZE; ++i)
+                    buffer[i] = NULL;
             }
-=======
-        // char buffer[BUFFER_SIZE] {};
-        char buffer[] = "Darek, otwórz\n";
-
-        while(true){
-
-            char a = 'k';
-
-            isix::wait(500);
-            puts("Darek\n");
-
->>>>>>> 0d0c7a6e87ff53dd486b30fb1d09a9c5983b0603
+                
         }
     }
 
@@ -272,59 +350,12 @@ auto main() -> int
 	static isix::semaphore m_ulock_sem { 1, 1 };
     isix::wait_ms( 500 );
 
-<<<<<<< HEAD
     // Configure GPIO
-=======
-#ifndef ISIX
-
-    // Enable GPIOA module that debug USART is connected to
-    LL_AHB1_GRP1_EnableClock(
-        LL_AHB1_GRP1_PERIPH_GPIOA
-    );
-
-    // Configure logging module
-	dblog_init_locked(
-		[](int ch, void*) {
-			return periph::drivers::uart_early::putc(ch);
-		},
-		nullptr,
-		[]() {
-			m_ulock_sem.wait(ISIX_TIME_INFINITE);
-		},
-		[]() {
-			m_ulock_sem.signal();
-		},
-		periph::drivers::uart_early::open,
-		"serial0", 115200
-	);
-
-    // GPIO configuration
->>>>>>> 0d0c7a6e87ff53dd486b30fb1d09a9c5983b0603
     GPIO_config();
 
     // USART1 configuration
     USART1_config();
 
-<<<<<<< HEAD
-=======
-    // Send welcome message to the log (UART)
-    dbprintf("");
-    dbprintf("");
-    dbprintf("<<<< Hello STM32F411E-DISCO board >>>>");
-    dbprintf("");
-    dbprintf("");
-
-#else
-
-    // GPIO configuration
-    GPIO_config();
-
-    // Enable USART1
-    periph::drivers::uart_early::open("serial1", 115200);
-
-#endif
-
->>>>>>> 0d0c7a6e87ff53dd486b30fb1d09a9c5983b0603
     // Create task
 	isix::task_create( shell, nullptr, 1536, isix::get_min_priority() );
 

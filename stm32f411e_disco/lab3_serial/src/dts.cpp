@@ -79,7 +79,6 @@ namespace {
 			nullptr
 		},
 
-<<<<<<< HEAD
 		{
 			"serial1", reinterpret_cast<uintptr_t>(USART1),
 			bus::apb2, LL_GPIO_AF_7,
@@ -88,8 +87,6 @@ namespace {
 			nullptr
 		},
 
-=======
->>>>>>> 0d0c7a6e87ff53dd486b30fb1d09a9c5983b0603
 		{
 			"spi1", reinterpret_cast<uintptr_t>(SPI1),
 			bus::apb2, LL_GPIO_AF_5,
