@@ -1,6 +1,6 @@
 {
 	"jtag": {
-		"target": 	"stm32f411e_disco/lab3_serial/serial",
+		"target": 	"stm32f411e_disco/lab4_spi_i2c/spi_i2c",
 		"type": 	"stlink-v2",
 		"speed": 	2000,
 		"swd":      1

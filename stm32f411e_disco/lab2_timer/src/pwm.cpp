@@ -1,17 +1,14 @@
-#include <config/conf.h> // ISIX base configuration
-#include <foundation/sys/dbglog.h> // Logging module
-#include <periph/drivers/serial/uart_early.hpp> // UART module used by logging module
-
-#include <isix.h> // ISIX system modules
-#include <isix/arch/irq.h> // ISIX interrupts
-#include <periph/gpio/gpio.hpp> // GPIO framewoek
-
-
-#include <stm32_ll_bus.h> // Peripherals clocking
-#include <stm32_ll_exti.h> // EXTI module
-#include <stm32_ll_rcc.h> // CLK & Reset module
-#include <stm32_ll_system.h> // Flash latency
-#include <stm32_ll_tim.h> // TIMx modules
+#include <config/conf.h>                        // (ISIX) : base configuration
+#include <isix.h>                               //  ISIX  : system modules
+#include <isix/arch/irq.h>                      //  ISIX  : ISR symbols
+#include <foundation/sys/dbglog.h>              // FOUNDATION : Logging module
+#include <periph/gpio/gpio.hpp>                 // PERIPH : GPIO framework
+#include <periph/drivers/serial/uart_early.hpp> // PERIPH : UART controller used by logging module
+#include <stm32_ll_bus.h>                       // LL : Bus control (peripherals enabling)
+#include <stm32_ll_exti.h>                      // LL : EXTI controller
+#include <stm32_ll_rcc.h>                       // LL : Reset & Clock control
+#include <stm32_ll_system.h>                    // LL : Flash latency
+#include <stm32_ll_tim.h>                       // LL : timers API
 
 namespace {
 

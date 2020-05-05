@@ -11,15 +11,16 @@ def configure(conf):
 
 
 def build(bld):
-    src = [ 'src/dts.cpp' ]
-    src += [ 'src/counter_isix.cpp' ]
-    # src += [ 'src/counter_ll.cpp' ]
+    src = ['src/dts.cpp', 'src/L3GD20.cpp']
+    src += ['src/spi.cpp']
+    # src += ['src/i2c.cpp']
+    cppflags = ['-DISIX ']
     bld.program(
         features     = 'objcopy',
-        target       = 'counter',
+        target       = 'spi_i2c',
         source       = src,
         install_path = False,
-        includes     = [ '.' ],
+        includes     = [ 'include' ],
         use          = [ 'isix', 'periph', 'foundation', 'stm32f411ed_boot' ],
-        cxxflags     = [ ]
+        cxxflags     = cppflags
     )

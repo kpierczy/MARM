@@ -12,8 +12,8 @@ def configure(conf):
 
 def build(bld):
     src = [ 'src/dts.cpp' ]
-    # src += ['src/synchronous.cpp']
-    src += ['src/asynchronous.cpp']
+    src += ['src/synchronous.cpp']
+    # src += ['src/asynchronous.cpp']
     bld.program(
         features     = 'objcopy',
         target       = 'serial',

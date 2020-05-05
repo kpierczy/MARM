@@ -1,13 +1,16 @@
-#include <config/conf.h>                        // ISIX base configuration
-#include <foundation/sys/dbglog.h>              // Logging module
-#include <periph/drivers/serial/uart_early.hpp> // UART module used by logging module
-#include <isix.h>                               // ISIX system modules
-#include <isix/arch/irq.h>                      // ISR symbols
-#include <memory.h>                             // Heap informations
-#include <periph/gpio/gpio.hpp>                 // GPIOs module
-#include <stm32_ll_bus.h>                       // Bus control (peripherals enabling)
-#include <stm32_ll_usart.h>                     // USART control
-#include <string.h>                             // C-strings formatting
+#include <config/conf.h>                        // (ISIX) : base configuration
+#include <isix.h>                               //  ISIX  : system modules
+#include <isix/arch/irq.h>                      //  ISIX  : ISR symbols
+#include <memory.h>                             //  ISIX  : Heap informations
+#include <foundation/sys/dbglog.h>              // FOUNDATION : Logging module
+#include <periph/gpio/gpio.hpp>                 // PERIPH : GPIO framework
+#include <periph/clock/clocks.hpp>              // PERIPH : clocks enabling
+#include <periph/drivers/spi/spi_master.hpp>    // PERIPH : SPI controller
+#include <periph/drivers/serial/uart_early.hpp> // PERIPH : UART controller used by logging module
+#include <stm32_ll_bus.h>                       // LL : Bus control (peripherals enabling)
+#include <stm32_ll_usart.h>                     // LL : USART control
+#include <string.h>                             // STD : C-strings formatting
+
 
 namespace {
 
