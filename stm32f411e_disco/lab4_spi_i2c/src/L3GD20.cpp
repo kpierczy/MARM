@@ -95,11 +95,9 @@ int L3GD20::readMeasurementRegisters(float* dst, uint8_t start_address, uint8_t 
     if(readRegisters(measurement_read_input, start_address, num * 2) < 0)
         return -1;
 
-    return num;
-
     // Copy read registers to the 'dst' array
     for(int i = 0; i < num; ++i){
-        int16_t tmp = (int16_t(measurement_read_input[i*2 + 2]) << 8) | int16_t(measurement_read_input[i*2 + 1]);
+        int16_t tmp = (int16_t(measurement_read_input[i*2 + 1]) << 8) | int16_t(measurement_read_input[i*2]);
         dst[i] =  float(tmp) * resolution / INT16_MAX;
     }
 
@@ -158,15 +156,15 @@ int L3GD20::readRegisters(uint8_t* dst, uint8_t start_address, uint8_t num){
      * and make L3GD20 able to write registers' content to
      * the bus. These writes are empty.
      */      
-    const uint8_t ouput[50] = {};
+    uint8_t output[50] = {};
     if(num == 1)
         output[0] =  start_address | L3GD20_READ | L3GD20_NO_AUTOINC;
     else
         output[0] =  start_address | L3GD20_READ | L3GD20_AUTOINC;
 
     uint8_t input[50] = {};
-    static_assert(sizeof(input) == sizeof(ouput));
-    periph::blk::trx_transfer tran(ouput, input, num + 1);
+    static_assert(sizeof(input) == sizeof(output));
+    periph::blk::trx_transfer tran(output, input, num + 1);
 
     // Perform transaction
     int ret = spi.transaction(0, tran);
