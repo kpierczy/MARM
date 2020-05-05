@@ -11,7 +11,7 @@ def configure(conf):
 
 
 def build(bld):
-    src = ['src/dts.cpp', 'src/L3GD20.cpp']
+    src = ['src/dts.cpp', 'src/L3GD20.cpp', 'src/LSM303.cpp']
     src += ['src/spi.cpp']
     # src += ['src/i2c.cpp']
     cppflags = ['-DISIX ']

@@ -1,67 +1,57 @@
-#ifndef L3GD20_H
-#define L3GD20_H
+#ifndef LSM303_H
+#define LSM303_H
 
 #include <stdint.h>
-#include <stm32_ll_spi.h>
-#include <periph/drivers/spi/spi_master.hpp>
+#include <stm32_ll_i2c.h>
+#include <periph/drivers/i2c/i2c_master.hpp>
 
-class L3GD20{
+class LSM303{
 
 // Public types & constructors
 public:
 
+    enum sensor{
+        ACC,
+        MAG
+    };
+
     typedef struct spi_init_isix_t{
-        unsigned                             speed;
-        periph::option::polarity::_polarity  polarity;
-        periph::option::phase::_phase        phase;
-        unsigned char                        dwidth;
-        enum periph::option::bitorder::order bitorder;
-        unsigned                             timeout;
-    } SPI_InitType_ISIX;
+        unsigned speed;
+        unsigned timeout;
+    } I2C_InitType_ISIX;
 
     typedef struct spi_init_t{
-        SPI_TypeDef* SPIx;
-        uint32_t     dwidth;
-        uint32_t     polarity;
-        uint32_t     phase;
-        uint32_t     prescaler;
-        uint32_t     bitorder;
-    } SPI_InitType;
+        I2C_TypeDef* I2Cx;
+        uint32_t     speed;
+        uint32_t     dutycycle;
+        uint32_t     afilter;
+        uint32_t     dfilter;
+    } I2C_InitType;
 
     /**
      * Constructor using ISIX periph library
      * 
-     * @param name : name of the SPI device registered in the dts
-     * @param init : initialization structure with SPI's parameters
-     * @param used_ports : flags of the ports being used by the SPI's pins
+     * @param name : name of the I2C device registered in the dts
+     * @param init : initialization structure with I2C's parameters
+     * @param used_ports : flags of the ports being used by the I2C's pins
      *        given as LL ored macros
      */
-    L3GD20(const char* name, SPI_InitType_ISIX * init, uint32_t used_ports);
+    LSM303(const char* name, I2C_InitType_ISIX * init, uint32_t used_ports);
 
     /**
      * Constructor using bare-metal LL API
      * 
-     * @param init : initialization structure with SPI's parameters
-     * @param used_ports : flags of the ports being used by the SPI's pins
+     * @param init : initialization structure with I2C's parameters
+     * @param used_ports : flags of the ports being used by the I2C's pins
      *        given as LL ored macros
-     * @note : fields of the SPI_InitType struct should be filled
+     * @note : fields of the I2C_InitType struct should be filled
      *         using LL macros
      */
-    // L3GD20(SPI_InitType * init, uint32_t used_ports);
+    // LSM303(I2C_InitType * init, uint32_t used_ports);
 
 // Public interface
 public:
 
-    /**
-     * Reads WHO_AM_I register. If register's value is valid
-     * L3GD20 gyroscope is properly connected to the bus
-     * and 'true' value is returned. Otherwise some problems
-     * have been met and communication with module is not
-     * possible. Then, false is returned.
-     * 
-     * @returns : true, if L3GD20 is properly connected to the bus
-     */
-    bool isConected();
 
     /**
      * Reads required block of the control registers. If 
@@ -72,6 +62,7 @@ public:
      * valid number of registers is read. Other cells of the
      * 'dst' array are not modified.
      * 
+     * @param sen [in] : sensor to operate on (accelertometer/magnetometer)
      * @param dst [out] : array that read registers will be written to
      * @param start_address [in] : address of the first register
      * @param num [in] : number of registers to read
@@ -79,7 +70,7 @@ public:
      *            negative value otherwise
      * 
      */
-    int readControlRegisters(uint8_t* dst, uint8_t start_address, uint8_t num);
+    int readControlRegisters(sensor sen, uint8_t* dst, uint8_t start_address, uint8_t num);
 
     /**
      * Writes required block of the control registers. If 
@@ -90,6 +81,7 @@ public:
      * valid number of registers is written. Other cells of the
      * 'dst' array are not modified.
      * 
+     * @param sen [in] : sensor to operate on (accelertometer/magnetometer)
      * @param src [in] : array of values to write
      * @param start_address [in] : address of the first register
      * @param num [in] : number of registers to read
@@ -97,7 +89,7 @@ public:
      *            negative value otherwise
      * 
      */
-    int writeControlRegisters(const uint8_t* src, uint8_t start_address, uint8_t num);
+    int writeControlRegisters(sensor sen, const uint8_t* src, uint8_t start_address, uint8_t num);
 
     /**
      * Reads required block of the measurement registers. If 
@@ -108,31 +100,35 @@ public:
      * valid number of registers is read. Other cells of the
      * 'dst' array are not modified.
      * 
+     * @param sen [in] : sensor to operate on (accelertometer/magnetometer)
      * @param dst [out] : array that read registers will be written to
      * @param start_address [in] : address of the first register
      * @param num [in] : number of registers to read
      * @returns : number of registers that was read and
      *            negative value otherwise 
      */
-    int readMeasurementRegisters(float* dst, uint8_t start_address, uint8_t num);
+    int readMeasurementRegisters(sensor sen, float* dst, uint8_t start_address, uint8_t num);
 
 // Internal members
 private:
-    // Actual sensor's resolution
-    float resolution;
+    // Actual sensor's resolutions
+    float resolution_a;
+    float resolution_m;
     // Flag indicating if object was initialized properly (when ISIX used)
     bool valid;
-    // Internal instance of the SPI driver (when ISIX used)
-    periph::drivers::spi_master spi;
+    // Internal instance of the I2C driver (when ISIX used)
+    periph::drivers::i2c_master i2c;
 
 // Internal interface
 private:
 
     /**
-     * Performs simple SPI read from the registers given with
-     * 'start__address' and size of the block 'num'
+     * Performs simple I2C read from the registers of the device given
+     * with 'addr' address. First address read is indicated with
+     * 'start_address' and size of the block of registers with 'num'
      * 
      * @param dst [out] : array that read registers will be written to
+     * @param addr [in] : address of the device
      * @param start_address [in] : address of the first register
      * @param num [in] : number of registers to read
      * @returns : number of registers that was read and
@@ -141,13 +137,15 @@ private:
      * @note : no data validation is performed. It is caller's duty to
      *         check if addresses' range is valid.
      */
-    int readRegisters(uint8_t* dst, uint8_t start_address, uint8_t num);
+    int readRegisters(uint8_t* dst, uint8_t addr, uint8_t start_address, uint8_t num);
 
     /**
-     * Performs simple SPI write to the registers given with
-     * 'start__address' and size of the block 'num'
+     * Performs simple I2C write to the registers of the device given
+     * with 'addr' address. First address read is indicated with
+     * 'start_address' and size of the block of registers with 'num'
      * 
      * @param src [in] : array that read registers will be written with
+     * @param addr [in] : address of the device
      * @param start_address [in] : address of the first register
      * @param num [in] : number of registers to read
      * @returns : number of registers that was read and
@@ -156,7 +154,7 @@ private:
      * @note : no data validation is performed. It is caller's duty to
      *         check if addresses' range and values are valid.
      */
-    int writeRegisters(const uint8_t* src, uint8_t start_address, uint8_t num);
+    int writeRegisters(const uint8_t* src, uint8_t addr, uint8_t start_address, uint8_t num);
 
 };
 

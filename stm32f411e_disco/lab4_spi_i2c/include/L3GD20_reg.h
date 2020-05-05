@@ -1,3 +1,6 @@
+#ifndef L3GD20_REG_H
+#define L3GD20_REG_H
+
 // Identification register
 #define L3GD20_WHO_AM_I 0x0F
 
@@ -21,3 +24,5 @@
 #define L3GD20_WRITE         0x00
 #define L3GD20_AUTOINC       0x40
 #define L3GD20_NO_AUTOINC    0x00
+
+#endif
