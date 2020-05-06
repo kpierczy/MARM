@@ -1,8 +1,24 @@
+/*================================================================================
+ *
+ *    Filename : LSM303_reg.h
+ *        Date : Wed May 06 2020
+ *      Author : Krzysztof Pierczyk
+ *     Version : 0.0.1
+ *
+ *    Platform : stm32f411e-DISCO
+ *        Core : stm32f411vet
+ *
+ * Description : Macros for crucial registers of LSM303 (accelerometer & magneto-
+ *               meter) as well as addresses of both devices on the I2C bus.
+ *
+ *===============================================================================*/
+
+
 #ifndef LSM303_REG_H
 #define LSM303_REG_H
 
 #define LSM303_READ        0x01
-#define LSM303_WRITE       0x01
+#define LSM303_WRITE       0x00
 #define LSM303_AUTOINC     0x80
 #define LSM303_NO_AUTOINC  0x00
 

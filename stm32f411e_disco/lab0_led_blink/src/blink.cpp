@@ -1,3 +1,20 @@
+/*================================================================================
+ *
+ *    Filename : blink.cpp
+ *        Date : Wed May 06 2020
+ *      Author : Krzysztof Pierczyk
+ *     Version : 0.0.1
+ *
+ *    Platform : stm32f411e-DISCO
+ *        Core : stm32f411vet
+ *
+ * Description : Programm blinks a LD4 diode with a period of 500ms. Additionally,
+ *               number of main loop's iterations is printed via USART2 on the 
+ *               debug serial port.
+ *
+ *===============================================================================*/
+
+
 #include <config/conf.h>
 #include <foundation/sys/dbglog.h>
 #include <periph/drivers/serial/uart_early.hpp>

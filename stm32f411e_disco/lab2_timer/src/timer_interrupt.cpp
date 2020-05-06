@@ -1,3 +1,23 @@
+/*================================================================================
+ *
+ *    Filename : timer_interrupt.cpp
+ *        Date : Wed May 06 2020
+ *      Author : Krzysztof Pierczyk
+ *     Version : 0.0.1
+ *
+ *    Platform : stm32f411e-DISCO
+ *        Core : stm32f411vet
+ *
+ * Description : Programm generates periodical interrupts (with period regulated
+ *               with LED_FREQ constant) that turns-off one of the LED3-LED6
+ *               diodes and activates the next one resulting in "running point"
+ *               effect.
+ *               Information about actually activated LED is sent to the serial
+ *               debug port (USART2) at every switch.
+ *
+ *===============================================================================*/
+
+
 #include <config/conf.h>                        // (ISIX) : base configuration
 #include <isix.h>                               //  ISIX  : system modules
 #include <isix/arch/irq.h>                      //  ISIX  : ISR symbols

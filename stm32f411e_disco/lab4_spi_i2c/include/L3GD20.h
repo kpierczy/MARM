@@ -1,3 +1,27 @@
+/*================================================================================
+ *
+ *    Filename : L3GD20.h
+ *        Date : Wed May 06 2020
+ *      Author : Krzysztof Pierczyk
+ *     Version : 0.0.1
+ *
+ *    Platform : stm32f411e-DISCO
+ *        Core : stm32f411vet
+ *
+ * Description : Header of the class interfacing L3GD20 gyroscope with a basic
+ *               functions like reading and writting configuration and data
+ *               registers via SPI interface.
+ *              
+ *               All public methods are safe in use, e.g. invalid arguments
+ *               are discarded and an appropriate value is returned by the 
+ *               methods.
+ * 
+ *               Class is implemented using ISIX SPI drivers but an appropriate
+ *               interface is prepared to change these drivers to the are-metal
+ *               functions working with Low Level library API.
+ *
+ *===============================================================================*/
+
 #ifndef L3GD20_H
 #define L3GD20_H
 
@@ -116,10 +140,15 @@ public:
      */
     int readMeasurementRegisters(float* dst, uint8_t start_address, uint8_t num);
 
+    /**
+     * @returns : actual sensor's range
+     */
+    float getRange();
+
 // Internal members
 private:
-    // Actual sensor's resolution
-    float resolution;
+    // Actual sensor's range
+    float range;
     // Flag indicating if object was initialized properly (when ISIX used)
     bool valid;
     // Internal instance of the SPI driver (when ISIX used)

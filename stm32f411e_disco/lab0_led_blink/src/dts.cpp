@@ -1,3 +1,18 @@
+/*================================================================================
+ *
+ *    Filename : dts.cpp
+ *        Date : Wed May 06 2020
+ *      Author : Krzysztof Pierczyk
+ *     Version : 0.0.1
+ *
+ *    Platform : stm32f411e-DISCO
+ *        Core : stm32f411vet
+ *
+ * Description : System's device tree
+ *
+ *===============================================================================*/
+
+
 #include <cmath>
 #include <periph/dt/dts.hpp>
 #include <periph/gpio/gpio_numbers.hpp>

@@ -1,8 +1,12 @@
 /*
- * platform_setup.cpp
- *  Platform initializaton specific code
- *  Created on: 20 lis 2013
- *      Author: lucck
+ *============================================================
+ *
+ *   File name   : platform_setup.cpp
+ *   Created on  : 20 lis 2013
+ *   Author      : lucck
+ *   Description : Function crucial for the system startup
+ * 
+ *============================================================
  */
 #include <stm32_ll_rcc.h>
 #include <stm32_ll_bus.h>
@@ -17,16 +21,20 @@
 
 namespace drv {
 namespace board {
+
 namespace {
 
 	/**
      * Configures CLK sources as follows:
+     * 
      *  - SYSCLK Source : PLLCLK
-     *  - PLL Source : HSE
-     *  - HSI : Disabled
-     *  - HCLK : 100MHz
-     *  - APB1 : 50MHz
-     *  - APB2 : 100MHz
+     *  - PLL Source    : HSE
+     *  - HSI           : Disabled
+     *  - HCLK          : 100MHz
+     *  - APB1          : 50MHz
+     *  - APB2          : 100MHz
+     * 
+     * @returns : true if initialization succeded
      */
     bool uc_periph_setup()
     {
@@ -111,13 +119,12 @@ namespace {
         for(;;) asm volatile("wfi\n");
     }
 
-// unnamed namespace
 }
 
 extern "C" {
 
     /**
-     * Function is called just before call global constructors
+     * Function is called just before global constructors call
      */
     void _external_startup(void)
     {
@@ -150,11 +157,8 @@ extern "C" {
         _cm3_hard_hault_entry_fn( application_crash );
     }
     
-// extern "C"
 } 
 
-//board namespace
-}
-// drv namespace
-}
+} //board namespace
+} // drv namespace
 

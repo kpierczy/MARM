@@ -1,11 +1,12 @@
 /**
  * =====================================================================================
- * 	File: array_for_sort.hpp
- * 	Created Date: Tuesday, November 19th 2019, 8:44:35 pm
- * 	Author: Lucjan Bryndza
- * 	Copyright (c) 2019 BoFF
- *
- * 	GPL v2/3
+ * 
+ * 	 File        : array_for_sort.hpp
+ * 	 Created Date: Tuesday, November 19th 2019, 8:44:35 pm
+ * 	 Author      : Lucjan Bryndza, Copyright (c) 2019 BoFF
+ * 
+ * 	 License : GPL v2/3
+ * 
  * =====================================================================================
  */
 

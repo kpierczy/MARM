@@ -1,3 +1,17 @@
+/*================================================================================
+ *
+ *    Filename : L3GD20_reg.h
+ *        Date : Wed May 06 2020
+ *      Author : Krzysztof Pierczyk
+ *     Version : 0.0.1
+ *
+ *    Platform : stm32f411e-DISCO
+ *        Core : stm32f411vet
+ *
+ * Description : Macros for crucial registers of L3GD20 IC (gyroscope)
+ *
+ *===============================================================================*/
+
 #ifndef L3GD20_REG_H
 #define L3GD20_REG_H
 

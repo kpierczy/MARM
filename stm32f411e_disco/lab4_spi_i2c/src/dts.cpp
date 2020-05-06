@@ -1,9 +1,25 @@
+/*================================================================================
+ *
+ *    Filename : dts.cpp
+ *        Date : Wed May 06 2020
+ *      Author : Krzysztof Pierczyk
+ *     Version : 0.0.1
+ *
+ *    Platform : stm32f411e-DISCO
+ *        Core : stm32f411vet
+ *
+ * Description : System's device tree
+ *
+ *===============================================================================*/
+
 #include <cmath>
 #include <periph/dt/dts.hpp>
 #include <periph/gpio/gpio_numbers.hpp>
 #include <periph/dt/dts_config.hpp>
 #include <isix/arch/irq.h>
 #include <stm32_ll_usart.h>
+#include <stm32_ll_spi.h>
+#include <stm32_ll_i2c.h>
 #include <stm32_ll_gpio.h>
 #include <stm32_ll_bus.h>
 #include <stm32_ll_rcc.h>
@@ -70,7 +86,7 @@ namespace periph::dt::_dts_config {
 
 		constexpr device_conf i2c1_conf {
 			{},
-			I2C2_EV_IRQn,
+			I2C1_EV_IRQn,
 			1,7, 		  // IRQ prio subprio
 			0			  // Don't use DMA transfer
 		};

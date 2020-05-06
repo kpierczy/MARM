@@ -1,3 +1,17 @@
+/*================================================================================
+ *
+ *    Filename : L3GD20.cpp
+ *        Date : Wed May 06 2020
+ *      Author : Krzysztof Pierczyk
+ *     Version : 0.0.1
+ *
+ *    Platform : stm32f411e-DISCO
+ *        Core : stm32f411vet
+ *
+ * Description : Implementation of the L3GD20 interface class. @see L3GD20.h
+ *
+ *===============================================================================*/
+
 #include<stm32_ll_bus.h>
 #include "L3GD20.h"
 #include "L3GD20_reg.h"
@@ -61,13 +75,13 @@ int L3GD20::writeControlRegisters(const uint8_t* src, uint8_t start_address, uin
         if(start_address + i == L3GD20_CTRL_REG4){
             switch((src[i] & 0x30) >> 4){
                 case 0b00:
-                    resolution = 250;
+                    range = 250;
                     break;
                 case 0b01:
-                    resolution = 500;
+                    range = 500;
                     break;
                 default:
-                    resolution = 2000;
+                    range = 2000;
                     break;
             }
             break;
@@ -98,10 +112,17 @@ int L3GD20::readMeasurementRegisters(float* dst, uint8_t start_address, uint8_t 
     // Copy read registers to the 'dst' array
     for(int i = 0; i < num; ++i){
         int16_t tmp = (int16_t(measurement_read_input[i*2 + 1]) << 8) | int16_t(measurement_read_input[i*2]);
-        dst[i] =  float(tmp) * resolution / INT16_MAX;
+        dst[i] =  float(tmp) * range / INT16_MAX;
     }
 
     return num;    
+}
+
+
+
+
+float L3GD20::getRange(){
+    return range;
 }
 
 
@@ -112,7 +133,7 @@ int L3GD20::readMeasurementRegisters(float* dst, uint8_t start_address, uint8_t 
 L3GD20::L3GD20(const char* name, SPI_InitType_ISIX * init, uint32_t used_ports)
     : valid(true),
       spi(name),
-      resolution(250)
+      range(250)
 {
 
     // Enable GPIOs clocks
@@ -158,9 +179,9 @@ int L3GD20::readRegisters(uint8_t* dst, uint8_t start_address, uint8_t num){
      */      
     uint8_t output[50] = {};
     if(num == 1)
-        output[0] =  start_address | L3GD20_READ | L3GD20_NO_AUTOINC;
+        output[0] = start_address | L3GD20_READ | L3GD20_NO_AUTOINC;
     else
-        output[0] =  start_address | L3GD20_READ | L3GD20_AUTOINC;
+        output[0] = start_address | L3GD20_READ | L3GD20_AUTOINC;
 
     uint8_t input[50] = {};
     static_assert(sizeof(input) == sizeof(output));
@@ -186,9 +207,9 @@ int L3GD20::writeRegisters(const uint8_t* src, uint8_t start_address, uint8_t nu
     // Prepare write structure
     uint8_t output[50] {};
     if(num == 1)
-        output[0] =  start_address | L3GD20_WRITE | L3GD20_NO_AUTOINC;
+        output[0] = start_address | L3GD20_WRITE | L3GD20_NO_AUTOINC;
     else
-        output[0] =  start_address | L3GD20_WRITE | L3GD20_AUTOINC;
+        output[0] = start_address | L3GD20_WRITE | L3GD20_AUTOINC;
     for(int i = 0; i < num; ++i)
         output[i + 1] = src[i];
     periph::blk::tx_transfer tran(output, num + 1);

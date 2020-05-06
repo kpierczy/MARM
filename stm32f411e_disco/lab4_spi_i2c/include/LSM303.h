@@ -1,3 +1,27 @@
+/*================================================================================
+ *
+ *    Filename : LSM303.h
+ *        Date : Wed May 06 2020
+ *      Author : Krzysztof Pierczyk
+ *     Version : 0.0.1
+ *
+ *    Platform : stm32f411e-DISCO
+ *        Core : stm32f411vet
+ *
+ * Description : Header of the class interfacing LSM303 accelerometer/magnetometer
+ *               with a basic functions like reading and writting configuration 
+ *               and data registers via I2C interface.
+ *              
+ *               All public methods are safe in use, e.g. invalid arguments
+ *               are discarded and an appropriate value is returned by the 
+ *               methods.
+ * 
+ *               Class is implemented using ISIX SPI drivers but an appropriate
+ *               interface is prepared to change these drivers to the are-metal
+ *               functions working with Low Level library API.
+ *
+ *===============================================================================*/
+
 #ifndef LSM303_H
 #define LSM303_H
 
@@ -109,11 +133,21 @@ public:
      */
     int readMeasurementRegisters(sensor sen, float* dst, uint8_t start_address, uint8_t num);
 
+    /**
+     * @returns : actual accelerometer's range
+     */
+    float getAccRange();
+
+    /**
+     * @returns : actual magnetometer's range
+     */
+    float getMagRange();
+
 // Internal members
 private:
-    // Actual sensor's resolutions
-    float resolution_a;
-    float resolution_m;
+    // Actual sensor's ranges
+    float range_a;
+    float range_m;
     // Flag indicating if object was initialized properly (when ISIX used)
     bool valid;
     // Internal instance of the I2C driver (when ISIX used)

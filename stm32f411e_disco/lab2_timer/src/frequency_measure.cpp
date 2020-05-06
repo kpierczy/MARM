@@ -1,3 +1,33 @@
+/*================================================================================
+ *
+ *    Filename : frequency_measure.cpp
+ *        Date : Wed May 06 2020
+ *      Author : Krzysztof Pierczyk
+ *     Version : 0.0.1
+ *
+ *    Platform : stm32f411e-DISCO
+ *        Core : stm32f411vet
+ *
+ * Description : Programm measures period (and calculates frequency) of the 
+ *               square wave signal present on the PA6 pin (TIM3, Channel 1).
+ *               Resolution and range of the measurement are limited according
+ *               to the @doc.
+ *               If no external square wave signal is available, MCU generates
+ *               such a signal on the PA1 pin (TIM5, channel 2). The signal
+ *               is of one of three available frequencies:
+ * 
+ *                  (1) 10kHz,
+ *                  (2) 100kHz,
+ *                  (3) 1MHz
+ * 
+ *               User can set freuency pressing USER button which is debounced
+ *               with a software procedure. Actual and measured frequencies
+ *               are sent to the sebug serial port (USART2, according to the 
+ *               device tree [dtc.cpp]) with a period of 1s.
+ *
+ *===============================================================================*/
+
+
 #include <config/conf.h>                        // (ISIX) : base configuration
 #include <isix.h>                               //  ISIX  : system modules
 #include <isix/arch/irq.h>                      //  ISIX  : ISR symbols
@@ -289,7 +319,7 @@ extern "C" {
         // Print measured frequency
         if(period != 0)
             dbprintf(
-                "Measured period : %i Hz",
+                "Measured frequency : %i Hz",
                 (uint32_t)(100000000.0f / period)
             );
         else

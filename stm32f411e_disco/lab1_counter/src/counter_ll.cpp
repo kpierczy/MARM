@@ -1,3 +1,21 @@
+/*================================================================================
+ *
+ *    Filename : counter_ll.cpp
+ *        Date : Wed May 06 2020
+ *      Author : Krzysztof Pierczyk
+ *     Version : 0.0.1
+ *
+ *    Platform : stm32f411e-DISCO
+ *        Core : stm32f411vet
+ *
+ * Description : Programm counts USER button pushes using EXTI peripheral module.
+ *               Four least significant bits of the counter are displayed using
+ *               LED3-LED6 diodes. Programm debouncing procedure has been 
+ *               implemented. Task was accomplished using basic LL functions.
+ *
+ *===============================================================================*/
+
+
 #include <config/conf.h>                        // (ISIX) : base configuration
 #include <isix.h>                               //  ISIX  : system modules
 #include <isix/arch/irq.h>                      //  ISIX  : ISR symbols

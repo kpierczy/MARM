@@ -1,6 +1,6 @@
 /*================================================================================
  *
- *    Filename : square_wave.cpp
+ *    Filename : common.cpp
  *        Date : Wed May 06 2020
  *      Author : Krzysztof Pierczyk
  *     Version : 0.0.1
@@ -8,27 +8,23 @@
  *    Platform : stm32f411e-DISCO
  *        Core : stm32f411vet
  *
- * Description : Programm generates 50% duty cycle PWM driving LED3-LED6 diodes
- *               using TIM4 timer/counter. Frequency of the each signal is 1Hz.
- *               Subsequent signals are shifted 90 deg against each other so
- *               that "running point" effect is generated.
+ * Description : Functions common to both versions of the programm
  *
  *===============================================================================*/
 
-#include <config/conf.h>                        // (ISIX) : base configuration
-#include <isix.h>                               //  ISIX  : system modules
+#include <config/conf.h>                        // ISIX       : Base configuration
+#include <isix.h>                               // ISIX       : System modules
 #include <foundation/sys/dbglog.h>              // FOUNDATION : Logging module
-#include <periph/gpio/gpio.hpp>                 // PERIPH : GPIO framework
-#include <periph/drivers/serial/uart_early.hpp> // PERIPH : UART controller used by logging module
-#include <stm32_ll_bus.h>                       // LL : Bus control (peripherals enabling)
-#include <stm32_ll_rcc.h>                       // LL : Reset & Clock control
-#include <stm32_ll_system.h>                    // LL : Flash latency
-#include <stm32_ll_tim.h>                       // LL : timers API
+#include <foundation/sys/tiny_printf.h>         // FOUNDATION : printf
+#include <periph/drivers/serial/uart_early.hpp> // PERIPH     : UART controller used by logging module
+#include <periph/gpio/gpio.hpp>                 // PERIPH     : GPIO framework
+#include <periph/clock/clocks.hpp>              // PERIPH     : Clocks enabling
+#include <stm32_ll_bus.h>                       // LL         : clock enable bit masks
+#include <stm32_ll_tim.h>                       // LL         : timers API
 
-namespace {
+void gyro(void*);
 
-    // Counter that indicates number of the actually turned-on LED
-    volatile int led_counter = 0;
+namespace{
     
     // Display LEDs
     constexpr auto LED3 = periph::gpio::num::PD13;
@@ -36,10 +32,14 @@ namespace {
     constexpr auto LED5 = periph::gpio::num::PD14;
     constexpr auto LED6 = periph::gpio::num::PD15;
 
-     // GPIO ports configuration
-    void GPIO_config(){
 
-        // Enable clocks for GPIOD
+    /**
+     *  Timer4 configuration for PWM (variable duty cycle)
+     *  driving LEDs.
+     */
+    void TIM4_config(void){
+
+        // Enable clocks for GPIOs (A & D)
         LL_AHB1_GRP1_EnableClock(LL_AHB1_GRP1_PERIPH_GPIOD);
         
         // Configure LEDs to alternate function (TIM4_CHx)
@@ -51,13 +51,6 @@ namespace {
                 periph::gpio::speed::low
             }
         );
-    }
-
-    /**
-     *  Timer4 configuration for PWM (50% duty cycle)
-     *  used to drive LEDs.
-     */
-    void TIM4_config(void){
 
         // Enable clock from APB1 for the TIM4 periph
         LL_APB1_GRP1_EnableClock(LL_APB1_GRP1_PERIPH_TIM4);
@@ -69,39 +62,39 @@ namespace {
          * TIM4 configuration structure
          *  - Mode : up
          *  - Frequencies:
-         *      + DK_CNT : 10kHz
-         *      + OVF    : 2Hz
+         *      + CK_CNT : 100 kHz
+         *      + OVF    : 200 Hz
          */
         LL_TIM_InitTypeDef TIM4_struct{
-            .Prescaler         = __LL_TIM_CALC_PSC(100000000 , 10000),
-            .Autoreload        = __LL_TIM_CALC_ARR(100000000 , __LL_TIM_CALC_PSC(100000000 , 10000), 2)
+            .Prescaler         = __LL_TIM_CALC_PSC(100000000 , 100000),
+            .Autoreload        = 499
         };
         LL_TIM_Init(TIM4, &TIM4_struct);
 
         /**
          * TIM4 compare/capture configuration structures
-         *     - Mode : Toggle
-         *     - Frequency : 1Hz
-         *     - Subsequent LEDs have got a phase
-         *       shifted by the 90 degrees :
-         *          + LED3 : 0   degree
-         *          + LED5 : 90  degree
-         *          + LED6 : 180 degree
-         *          + LED4 : 270 degree
+         *     - Subsequent LEDs have got a duty
+         *        cycle changed :
+         *          + LED3 : 20 %
+         *          + LED5 : 40 %
+         *          + LED6 : 60 %
+         *          + LED4 : 0 - 100 % 
+         *     - Duty cycle of the LED4 changes by 10% every
+         *       single USER button press (UP and DOWN)
          *     - CCRx buffered
          */
         LL_TIM_OC_InitTypeDef TIM4_CC_struct{
-            .OCMode       = LL_TIM_OCMODE_TOGGLE,
+            .OCMode       = LL_TIM_OCMODE_PWM1,
             .OCState      = LL_TIM_OCSTATE_ENABLE
         };
         // Channel_2 = LED3
-        TIM4_CC_struct.OCPolarity   = LL_TIM_OCPOLARITY_LOW,
+        TIM4_CC_struct.OCPolarity   = LL_TIM_OCPOLARITY_HIGH,
         TIM4_CC_struct.CompareValue = 0;
         LL_TIM_OC_EnablePreload(TIM4, LL_TIM_CHANNEL_CH2);
         LL_TIM_OC_Init(TIM4, LL_TIM_CHANNEL_CH2, &TIM4_CC_struct);
         // Channel_2 = LED5
         TIM4_CC_struct.OCPolarity   = LL_TIM_OCPOLARITY_HIGH,
-        TIM4_CC_struct.CompareValue = (uint32_t)((TIM4_struct.Autoreload + 1) / 2);
+        TIM4_CC_struct.CompareValue = 0;
         LL_TIM_OC_EnablePreload(TIM4, LL_TIM_CHANNEL_CH3);
         LL_TIM_OC_Init(TIM4, LL_TIM_CHANNEL_CH3, &TIM4_CC_struct);
         // Channel_2 = LED6
@@ -110,8 +103,8 @@ namespace {
         LL_TIM_OC_EnablePreload(TIM4, LL_TIM_CHANNEL_CH4);
         LL_TIM_OC_Init(TIM4, LL_TIM_CHANNEL_CH4, &TIM4_CC_struct);
         // Channel_2 = LED4
-        TIM4_CC_struct.OCPolarity   = LL_TIM_OCPOLARITY_LOW,
-        TIM4_CC_struct.CompareValue = (uint32_t)((TIM4_struct.Autoreload + 1) / 2);
+        TIM4_CC_struct.OCPolarity   = LL_TIM_OCPOLARITY_HIGH,
+        TIM4_CC_struct.CompareValue = 0;
         LL_TIM_OC_EnablePreload(TIM4, LL_TIM_CHANNEL_CH1);
         LL_TIM_OC_Init(TIM4, LL_TIM_CHANNEL_CH1, &TIM4_CC_struct);
         
@@ -121,13 +114,9 @@ namespace {
         // Initialize shadow registers
         LL_TIM_GenerateEvent_UPDATE(TIM4);
     }
-
-    // Thread functions
-    void main_thread(void*){
-        while (true){
-        }
-    }
 }
+
+
 
 
 auto main() -> int
@@ -136,8 +125,11 @@ auto main() -> int
     isix::wait_ms( 500 );
 
     // Enable GPIOA for USART2 alternate function
-    LL_AHB1_GRP1_EnableClock(
-        LL_AHB1_GRP1_PERIPH_GPIOA
+    periph::clock::device_enable(
+        periph::dt::clk_periph{
+            .xbus = periph::dt::bus::ahb1,
+            .bit  = RCC_AHB1ENR_GPIOAEN_Pos
+        }
     );
 
     // Initialize debug logger
@@ -156,14 +148,11 @@ auto main() -> int
 		"serial0", 115200
 	);
 
-    // Configure LEDs
-    GPIO_config();
-
-    // Configure TIM1 timebase
+    // Configure TIM4 PWM for LEDs driving
     TIM4_config();
 
     // Create threads
-	isix::task_create(main_thread, nullptr, 1536, isix::get_min_priority() );
+	isix::task_create(gyro, nullptr, 1536, isix::get_min_priority() );
 
     // Send welcome message to the log (UART)
     dbprintf("");
@@ -171,6 +160,7 @@ auto main() -> int
     dbprintf("<<<< Hello STM32F411E-DISCO board >>>>");
     dbprintf("");
     dbprintf("");
+    fnd::tiny_printf("\r\n");
 
     // Begin scheduling
 	isix::start_scheduler();

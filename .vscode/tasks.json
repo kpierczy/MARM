@@ -50,7 +50,7 @@
             "type": "shell",
             "command": "python3",
             "args": [
-                " ${workspaceFolder}/waf",
+                "${workspaceFolder}/waf",
                 "distclean"
             ],
             "group": "build",

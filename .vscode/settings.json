@@ -11,12 +11,42 @@
 			"-Wno-pragma-once-outside-header",
 			"-m32"
 		],
-		"clang.cflags": [
-			"-std=c11",
-			"-m32"
-		],
-		"files.associations": {
-			"istream": "cpp",
-			"ostream": "cpp"
-		}
+	"clang.cflags": [
+		"-std=c11",
+		"-m32"
+	],
+	"files.associations": {
+		"istream": "cpp",
+		"ostream": "cpp",
+		"*.tcc": "cpp",
+		"chrono": "cpp",
+		"complex": "cpp"
+	},
+	"fileHeaderComment.parameter": {
+        "*":{
+            "commentbegin": "/*================================================================================",
+            "commentprefix": " *",
+            "commentend": " *===============================================================================*/",
+			"author": "Krzysztof Pierczyk",
+			"platform": "stm32f411e-DISCO",
+			"core": "stm32f411vet"
+        }
+    },
+    "fileHeaderComment.template": {
+        "*":[
+            "${commentbegin}",
+            "${commentprefix}",
+            "${commentprefix}    Filename : ${filename}",
+            "${commentprefix}        Date : ${date}",
+            "${commentprefix}      Author : ${author}",
+			"${commentprefix}     Version : 0.0.1",
+			"${commentprefix}",
+			"${commentprefix}    Platform : ${platform}",
+			"${commentprefix}        Core : ${core}",
+			"${commentprefix}",
+            "${commentprefix} Description : ",
+            "${commentprefix}",
+            "${commentend}"
+        ]
+    }
 }
