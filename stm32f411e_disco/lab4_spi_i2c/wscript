@@ -12,8 +12,8 @@ def configure(conf):
 
 def build(bld):
     src = ['src/dts.cpp', 'src/L3GD20.cpp', 'src/LSM303.cpp', 'src/common.cpp']
-    src += ['src/spi.cpp']
-    # src += ['src/i2c.cpp']
+    # src += ['src/spi.cpp']
+    src += ['src/i2c.cpp']
     cppflags = ['-DISIX ']
     bld.program(
         features     = 'objcopy',
