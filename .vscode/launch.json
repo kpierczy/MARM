@@ -8,7 +8,7 @@
             "name": "(gdb) Launch",
             "type": "cppdbg",
             "request": "launch",
-            "program": "${workspaceFolder}/build/stm32f411e_disco/lab4_spi_i2c/spi_i2c",
+            "program": "${workspaceFolder}/build/stm32f411e_disco/lab5_rtos/rtos",
             "args": [],
             "stopAtEntry": true,
             "cwd": "${workspaceFolder}",

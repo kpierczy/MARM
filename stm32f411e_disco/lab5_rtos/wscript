@@ -1,0 +1,28 @@
+#!/usr/bin/env python
+import os
+
+
+def options(opt):
+    pass
+
+def configure(conf):
+    conf.check_cxx( header_name='isix_config.h', features='cxx',
+            define_name='HAVE_ISIX_CONFIG_H' )
+
+
+def build(bld):
+    src = ['src/dts.cpp']
+    # src += ['src/thread.cpp']
+    # src += ['src/semaphore.cpp']
+    # src += ['src/fifo.cpp']
+    src += ['src/bitevents.cpp']
+    cppflags = ['-DISIX ']
+    bld.program(
+        features     = 'objcopy',
+        target       = 'rtos',
+        source       = src,
+        install_path = False,
+        includes     = [ 'include' ],
+        use          = [ 'isix', 'periph', 'foundation', 'stm32f411ed_boot' ],
+        cxxflags     = cppflags
+    )
