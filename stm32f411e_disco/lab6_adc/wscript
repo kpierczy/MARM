@@ -11,16 +11,14 @@ def configure(conf):
 
 
 def build(bld):
-    src = [ 'src/dts.cpp' ]
-    # src += ['src/timer_interrupt.cpp']
-    # src += ['src/square_wave.cpp']
-    # src += ['src/pwm.cpp']
-    src += ['src/frequency_measure.cpp']
+    src = ['src/dts.cpp', 'src/adc.cpp']
+    cppflags = ['-DISIX ']
     bld.program(
         features     = 'objcopy',
-        target       = 'timer',
+        target       = 'adc',
         source       = src,
         install_path = False,
-        includes     = [ '.' ],
+        includes     = [ 'include' ],
         use          = [ 'isix', 'periph', 'foundation', 'stm32f411ed_boot' ],
+        cxxflags     = cppflags
     )

@@ -1,6 +1,6 @@
 {
 	"jtag": {
-		"target": 	"stm32f411e_disco/lab5_rtos/rtos",
+		"target": 	"stm32f411e_disco/lab6_adc/adc",
 		"type": 	"stlink-v2",
 		"speed": 	2000,
 		"swd":      1
