@@ -65,17 +65,8 @@ namespace {
     // User button
     constexpr auto BUTTON = periph::gpio::num::PA0;
 
-    // Generator's parameters
-    volatile unsigned int actualDutyCycleIdx = 0;
-    constexpr int dutyCyclesNum = 6;
-    uint32_t dutyCycle[] = {
-        0,
-        20,
-        40,
-        60,
-        80,
-        100
-    };
+    // Duty cycle increment at each button press [%]
+    float incrementStep = 0.25f;
 
     // Filter data
     volatile float rms {};
@@ -193,10 +184,9 @@ namespace{
         LL_TIM_OC_InitTypeDef TIM5_CC_struct{
             .OCMode       = LL_TIM_OCMODE_PWM1,
             .OCState      = LL_TIM_OCSTATE_ENABLE,
-            .CompareValue = dutyCycle[0] / 100 * TIM5->ARR,
+            .CompareValue = 0,
             .OCPolarity   = LL_TIM_OCPOLARITY_HIGH
         };
-        TIM5_CC_struct.CompareValue = dutyCycle[0] * TIM5->ARR / 100;
         LL_TIM_OC_EnablePreload(TIM5, LL_TIM_CHANNEL_CH2);
         LL_TIM_OC_Init(TIM5, LL_TIM_CHANNEL_CH2, &TIM5_CC_struct);
         
@@ -348,12 +338,13 @@ namespace app{
                             
                             pressed = true;
                             
-                            // Increment index of the actual duty cycle
-                            actualDutyCycleIdx = ++actualDutyCycleIdx % dutyCyclesNum; 
-
                             // Set next duty cycle
-                            TIM5->CCR2 =
-                                TIM5->ARR * dutyCycle[actualDutyCycleIdx] / 100;
+                            if(TIM5->CCR2 + float(incrementStep) / 100.0f * TIM5->ARR > (1<<16 - 1)){
+                                TIM5->CCR2 = 0;
+                            }else{
+                                TIM5->CCR2 = TIM5->CCR2 + float(incrementStep) / 100.0f * TIM5->ARR;
+                            }
+
                         }        
                     }
                     else
